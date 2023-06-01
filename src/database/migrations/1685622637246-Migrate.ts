@@ -29,7 +29,7 @@ export class Migrate1685622637246 implements MigrationInterface {
           {
             name: 'value',
             type: 'decimal',
-            precision: 10,
+            precision: 19,
             scale: 2,
           },
           {
@@ -39,13 +39,13 @@ export class Migrate1685622637246 implements MigrationInterface {
           {
             name: 'tax',
             type: 'decimal',
-            precision: 10,
+            precision: 19,
             scale: 2,
           },
           {
             name: 'total_operation',
             type: 'decimal',
-            precision: 10,
+            precision: 19,
             scale: 2,
           },
           {

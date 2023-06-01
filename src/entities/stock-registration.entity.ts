@@ -29,7 +29,7 @@ export class StockRegistration {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   tax: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
   total_operation: number;
 
   @CreateDateColumn()
