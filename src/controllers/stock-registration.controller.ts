@@ -8,7 +8,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { StockRegistrationDto } from 'src/dtos/stock-registration-purchase.dto';
+import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
 import { StockRegistrationService } from 'src/services/stock-registration.service';
 import { Response } from 'express';
 
@@ -18,7 +18,7 @@ export class StockRegistrationController {
 
   @Post('purchase')
   @UsePipes(ValidationPipe)
-  async createStock(
+  async createStockPurchase(
     @Body() createStockRegistrationDto: StockRegistrationDto,
     @Res() res: Response,
   ) {
@@ -33,9 +33,36 @@ export class StockRegistrationController {
           .status(201)
           .send({ message: 'Stock registered successfully!' });
       } else {
+        return res.status(404).send({ message: 'Bad Request' });
+      }
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('sale')
+  @UsePipes(ValidationPipe)
+  async createStockSale(
+    @Body() createStockRegistrationDto: StockRegistrationDto,
+    @Res() res: Response,
+  ) {
+    try {
+      const stockPurchase = await this.stockRegistrationService.createStockSale(
+        createStockRegistrationDto,
+      );
+
+      if (stockPurchase) {
         return res
-        .status(404)
-        .send({message: 'Bad Request'},)
+          .status(201)
+          .send({ message: 'Stock registered successfully!' });
+      } else {
+        return res.status(404).send({ message: 'Bad Request' });
       }
     } catch (error) {
       throw new HttpException(
