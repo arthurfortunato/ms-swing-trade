@@ -1,25 +1,30 @@
-import { IsNotEmpty } from 'class-validator';
-import { TypeStock } from 'src/enums/type-stock.enum';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class StockRegistrationDto {
   @IsNotEmpty()
-  type: TypeStock;
-
-  @IsNotEmpty()
+  @IsDateString()
   operation_date: Date;
 
   @IsNotEmpty()
+  @IsString()
+  @Length(5, 6)
   ticket: string;
 
   @IsNotEmpty()
+  @IsNumber()
   value: number;
 
   @IsNotEmpty()
+  @IsNumber()
   quantity: number;
 
   @IsNotEmpty()
+  @IsNumber()
   tax: number;
-
-  @IsNotEmpty()
-  total_operation: number;
 }

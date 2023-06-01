@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
+import { StockRegistrationDto } from 'src/dtos/stock-registration-purchase.dto';
 import { Repository } from 'typeorm';
 import { StockRegistration } from '../entities/stock-registration.entity';
+import { TypeStock } from 'src/enums/type-stock.enum';
 
 @Injectable()
 export class StockRegistrationService {
@@ -13,9 +14,25 @@ export class StockRegistrationService {
     private stockRegistrationRepository: Repository<StockRegistration>,
   ) {}
 
-  async createStock(stockDto: StockRegistrationDto) {
-    const newStock = this.stockRegistrationRepository.create(stockDto);
-    await this.stockRegistrationRepository.save(newStock);
-    return newStock;
+  async createStockPurchase(stockDto: StockRegistrationDto) {
+    try {
+      this.logger.log('Starting registered stock purchase');
+
+      const { value, quantity, tax } = stockDto;
+      const type = TypeStock.PURCHASE;
+      const totalOperation = value * quantity + tax;
+
+      const newStock = this.stockRegistrationRepository.create({
+        ...stockDto,
+        total_operation: totalOperation,
+        type: type,
+      });
+
+      await this.stockRegistrationRepository.save(newStock);
+      this.logger.log('Stock Purchase registered successfully!');
+      return newStock;
+    } catch (error) {
+      this.logger.error('Error registerd purchase', error);
+    }
   }
 }

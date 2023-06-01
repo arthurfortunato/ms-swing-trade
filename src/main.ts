@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './modules/app.module';
+import { Logger } from '@nestjs/common';
+
+const logger = new Logger('bootstrap');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -8,10 +11,10 @@ async function bootstrap() {
   const HOST = process.env.APP_HOST;
 
   await app.listen(PORT ?? 3000, () => {
-    console.log(`⚡️[server]: Server is running at ${HOST}:${PORT}`);
+    logger.log(`⚡️[server]: Server is running at ${HOST}:${PORT}`);
   });
 }
 
 bootstrap().catch((error) => {
-  console.log('Unable to connect to the database', error);
+  logger.log('Unable to connect to the database', error);
 });
