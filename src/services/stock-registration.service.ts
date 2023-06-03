@@ -52,35 +52,15 @@ export class StockRegistrationService {
   }
 
   async createStockSale(stockDto: StockRegistrationDto) {
-    try {
-      this.logger.log('Starting registered stock sale');
+    this.logger.log('Starting registered stock sale');
 
-      const { value, quantity, tax } = stockDto;
-      const type = TypeStock.SALE;
-      const totalOperation = value * quantity - tax;
-
-      const newStock = this.stockRegistrationRepository.create({
-        ...stockDto,
-        total_operation: totalOperation,
-        type: type,
-      });
-
-      await this.stockRegistrationRepository.save(newStock);
-      await this.makingSale(newStock);
-      this.logger.log('Stock Purchase registered successfully!');
-      return newStock;
-    } catch (error) {
-      this.logger.error('Error registerd purchase', error);
-    }
-  }
-
-  async makingSale(stockDto: StockRegistrationDto) {
-    const ticket = stockDto.ticket;
-    let quantityToSell = stockDto.quantity;
+    const { ticket, quantity } = stockDto;
+    let quantityToSell = quantity;
+    let quantityExecuted = 0;
 
     while (quantityToSell > 0) {
       this.logger.log(
-        'Check if there is a corresponding purchase with the ticket',
+        'Checking if there is a corresponding purchase with the ticket',
       );
 
       const correspondingPurchase = await this.purchaseRepository.findOne({
@@ -89,54 +69,54 @@ export class StockRegistrationService {
       });
 
       if (correspondingPurchase) {
-        if (correspondingPurchase.quantity >= quantityToSell) {
-          correspondingPurchase.quantity -= quantityToSell;
-          correspondingPurchase.status = 'CLOSE';
+        const quantitySold = correspondingPurchase.quantity;
 
-          const sale = new Sale();
-          sale.operation_date = stockDto.operation_date;
-          sale.ticket = stockDto.ticket;
-          sale.value = stockDto.value;
-          sale.quantity = quantityToSell;
-          sale.tax = stockDto.tax;
-          sale.total_operation = stockDto.value * quantityToSell - stockDto.tax;
-          sale.purchase_ticket_id = correspondingPurchase;
+        correspondingPurchase.quantity = 0;
+        correspondingPurchase.status = 'CLOSE';
 
-          this.logger.log('Save the sale and update the purchase');
-          await this.saleRepository.save(sale);
-          await this.purchaseRepository.save(correspondingPurchase);
+        const sale = new Sale();
+        sale.operation_date = stockDto.operation_date;
+        sale.ticket = stockDto.ticket;
+        sale.value = stockDto.value;
+        sale.quantity = quantitySold;
+        sale.tax = stockDto.tax;
+        sale.total_operation = stockDto.value * quantitySold - stockDto.tax;
+        sale.purchase_ticket_id = correspondingPurchase;
 
-          this.logger.log(
-            `Sale of ${quantityToSell} units successfully completed!`,
-          );
-          quantityToSell = 0;
-        } else {
-          const quantitySold = correspondingPurchase.quantity;
-          correspondingPurchase.quantity = 0;
-          correspondingPurchase.status = 'CLOSE';
+        this.logger.log('Save the sale and update the purchase');
 
-          const sale = new Sale();
-          sale.operation_date = stockDto.operation_date;
-          sale.ticket = stockDto.ticket;
-          sale.value = stockDto.value;
-          sale.quantity = quantitySold;
-          sale.tax = stockDto.tax;
-          sale.total_operation = stockDto.value * quantitySold - stockDto.tax;
-          sale.purchase_ticket_id = correspondingPurchase;
+        const type = TypeStock.SALE;
+        const newStock = this.stockRegistrationRepository.create({
+          ...sale,
+          type,
+        });
+        await this.saleRepository.save(sale);
+        await this.purchaseRepository.save(correspondingPurchase);
+        await this.stockRegistrationRepository.save(newStock);
+        this.logger.log('Stock Purchase registered successfully!');
 
-          await this.saleRepository.save(sale);
-          await this.purchaseRepository.save(correspondingPurchase);
+        quantityExecuted += quantitySold;
+        quantityToSell -= quantitySold;
 
-          this.logger.log(
-            `Sale of ${quantitySold} units successfully completed!`,
-          );
-          quantityToSell -= quantitySold;
-        }
+        this.logger.log(
+          `Sale of ${quantitySold} units successfully completed!`,
+        );
+      } else if (
+        quantityExecuted !== 0 &&
+        quantityExecuted < stockDto.quantity
+      ) {
+        this.logger.log(
+          `It was possible to perform only ${quantityExecuted} actions out of the ${quantity} requested`,
+        );
+        quantityToSell = 0;
       } else {
         this.logger.log(
           'It was not possible to find a purchase with the corresponding ticket in the "Open" state',
         );
         quantityToSell = 0;
+        throw new Error(
+          'It was not possible to find a purchase with the corresponding ticket in the "Open" state',
+        );
       }
     }
   }

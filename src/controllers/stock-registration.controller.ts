@@ -53,17 +53,11 @@ export class StockRegistrationController {
     @Res() res: Response,
   ) {
     try {
-      const stockPurchase = await this.stockRegistrationService.createStockSale(
+      await this.stockRegistrationService.createStockSale(
         createStockRegistrationDto,
       );
 
-      if (stockPurchase) {
-        return res
-          .status(201)
-          .send({ message: 'Stock registered successfully!' });
-      } else {
-        return res.status(404).send({ message: 'Bad Request' });
-      }
+      return res.status(201).send({ message: 'Successful sale!' });
     } catch (error) {
       throw new HttpException(
         {
