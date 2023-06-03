@@ -100,7 +100,7 @@ export class StockRegistrationService {
           sale.quantity = quantityToSell;
           sale.tax = stockDto.tax;
           sale.total_operation = stockDto.value * quantityToSell - stockDto.tax;
-          sale.purchase_id = correspondingPurchase;
+          sale.purchase_ticket_id = correspondingPurchase;
 
           this.logger.log('Save the sale and update the purchase');
           await this.saleRepository.save(sale);
@@ -122,7 +122,7 @@ export class StockRegistrationService {
           sale.quantity = quantitySold;
           sale.tax = stockDto.tax;
           sale.total_operation = stockDto.value * quantitySold - stockDto.tax;
-          sale.purchase_id = correspondingPurchase;
+          sale.purchase_ticket_id = correspondingPurchase;
 
           await this.saleRepository.save(sale);
           await this.purchaseRepository.save(correspondingPurchase);

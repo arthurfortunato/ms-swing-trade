@@ -40,6 +40,6 @@ export class Purchase {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Sale, (sale) => sale.purchase_id)
+  @OneToMany(() => Sale, (sale) => sale.purchase_ticket_id)
   operations: Sale[];
 }

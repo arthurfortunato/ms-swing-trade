@@ -53,10 +53,6 @@ export class Migrate1685666537269 implements MigrationInterface {
             scale: 2,
           },
           {
-            name: 'purchase_id',
-            type: 'int',
-          },
-          {
             name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',

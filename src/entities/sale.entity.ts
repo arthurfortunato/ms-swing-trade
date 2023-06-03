@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Purchase } from './purchase.entity';
 
@@ -14,7 +15,8 @@ export class Sale {
   id: number;
 
   @ManyToOne(() => Purchase, { onDelete: 'CASCADE' })
-  purchase_id: Purchase;
+  @JoinColumn({ name: 'purchase_ticket_id' })
+  purchase_ticket_id: Purchase;
 
   @Column({ type: 'date' })
   operation_date: Date;
