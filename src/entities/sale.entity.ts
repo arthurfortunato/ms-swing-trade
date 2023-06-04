@@ -36,6 +36,9 @@ export class Sale {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   total_operation: number;
 
+  @Column({ type: 'decimal', precision: 19, scale: 4 })
+  irrf: number;
+
   @CreateDateColumn()
   created_at: Date;
 

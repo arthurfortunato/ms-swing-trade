@@ -66,6 +66,7 @@ export class StockSaleService {
 
         sale.total_operation = stockDto.value * quantitySold - sale.tax;
         sale.purchase_ticket_id = correspondingPurchase;
+        sale.irrf = 0.00005 * quantitySold * stockDto.value;
 
         this.logger.log('Save the sale and update the purchase');
 

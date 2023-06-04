@@ -53,6 +53,12 @@ export class Migrate1685666537269 implements MigrationInterface {
             scale: 2,
           },
           {
+            name: 'irrf',
+            type: 'decimal',
+            precision: 19,
+            scale: 4,
+          },
+          {
             name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
