@@ -27,6 +27,7 @@ export class StockSaleService {
     const { ticket, quantity } = stockDto;
     let quantityToSell = quantity;
     let quantityExecuted = 0;
+    let taxCharged = false;
 
     while (quantityToSell > 0) {
       this.logger.log(
@@ -39,18 +40,31 @@ export class StockSaleService {
       });
 
       if (correspondingPurchase) {
-        const quantitySold = correspondingPurchase.quantity;
+        const quantitySold = Math.min(
+          correspondingPurchase.quantity,
+          quantityToSell,
+        );
 
-        correspondingPurchase.quantity = 0;
-        correspondingPurchase.status = 'CLOSE';
+        correspondingPurchase.quantity -= quantitySold;
+
+        if (correspondingPurchase.quantity === 0) {
+          correspondingPurchase.status = 'CLOSE';
+        }
 
         const sale = new Sale();
         sale.operation_date = stockDto.operation_date;
         sale.ticket = stockDto.ticket;
         sale.value = stockDto.value;
         sale.quantity = quantitySold;
-        sale.tax = stockDto.tax;
-        sale.total_operation = stockDto.value * quantitySold - stockDto.tax;
+
+        if (!taxCharged) {
+          sale.tax = stockDto.tax;
+          taxCharged = true;
+        } else {
+          sale.tax = 0;
+        }
+
+        sale.total_operation = stockDto.value * quantitySold - sale.tax;
         sale.purchase_ticket_id = correspondingPurchase;
 
         this.logger.log('Save the sale and update the purchase');
@@ -60,6 +74,7 @@ export class StockSaleService {
           ...sale,
           type,
         });
+
         await this.saleRepository.save(sale);
         await this.purchaseRepository.save(correspondingPurchase);
         await this.stockRegistrationRepository.save(newStock);
