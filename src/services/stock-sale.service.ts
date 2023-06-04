@@ -1,16 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
 import { Repository } from 'typeorm';
 import { StockRegistration } from '../entities/stock-registration.entity';
 import { TypeStock } from 'src/enums/type-stock.enum';
 import { Purchase } from 'src/entities/purchase.entity';
-import { StatusStock } from 'src/enums/status-stock.enum';
 import { Sale } from 'src/entities/sale.entity';
+import { AppError } from 'src/error/AppError';
 
 @Injectable()
-export class StockRegistrationService {
-  private readonly logger = new Logger(StockRegistrationService.name);
+export class StockSaleService {
+  private readonly logger = new Logger(StockSaleService.name);
 
   constructor(
     @InjectRepository(StockRegistration)
@@ -20,36 +20,6 @@ export class StockRegistrationService {
     @InjectRepository(Sale)
     private saleRepository: Repository<Sale>,
   ) {}
-
-  async createStockPurchase(stockDto: StockRegistrationDto) {
-    try {
-      this.logger.log('Starting registered stock purchase');
-
-      const { value, quantity, tax } = stockDto;
-      const type = TypeStock.PURCHASE;
-      const totalOperation = value * quantity + tax;
-
-      const newStock = this.stockRegistrationRepository.create({
-        ...stockDto,
-        total_operation: totalOperation,
-        type: type,
-      });
-
-      await this.stockRegistrationRepository.save(newStock);
-      this.logger.log('Stock Purchase registered successfully!');
-
-      const status = StatusStock.OPEN;
-      const newPurchase = this.purchaseRepository.create({
-        ...newStock,
-        status: status,
-      });
-      await this.purchaseRepository.save(newPurchase);
-
-      return newStock;
-    } catch (error) {
-      this.logger.error('Error registerd purchase', error);
-    }
-  }
 
   async createStockSale(stockDto: StockRegistrationDto) {
     this.logger.log('Starting registered stock sale');
@@ -105,17 +75,16 @@ export class StockRegistrationService {
         quantityExecuted !== 0 &&
         quantityExecuted < stockDto.quantity
       ) {
-        this.logger.log(
+        quantityToSell = 0;
+        throw new AppError(
           `It was possible to perform only ${quantityExecuted} actions out of the ${quantity} requested`,
+          HttpStatus.PARTIAL_CONTENT,
         );
-        quantityToSell = 0;
       } else {
-        this.logger.log(
-          'It was not possible to find a purchase with the corresponding ticket in the "Open" state',
-        );
         quantityToSell = 0;
-        throw new Error(
+        throw new AppError(
           'It was not possible to find a purchase with the corresponding ticket in the "Open" state',
+          HttpStatus.NOT_FOUND,
         );
       }
     }

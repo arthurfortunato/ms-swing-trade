@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  HttpException,
   HttpStatus,
   Post,
   Res,
@@ -9,63 +8,38 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
-import { StockRegistrationService } from 'src/services/stock-registration.service';
+import { StockPurchaseService } from 'src/services/stock-purchase.service';
+import { StockSaleService } from 'src/services/stock-sale.service';
 import { Response } from 'express';
 
 @Controller('stock-registration')
 export class StockRegistrationController {
-  constructor(private stockRegistrationService: StockRegistrationService) {}
+  constructor(
+    private stockPurchaseService: StockPurchaseService,
+    private stockSaleService: StockSaleService,
+  ) {}
 
   @Post('purchase')
   @UsePipes(ValidationPipe)
   async createStockPurchase(
-    @Body() createStockRegistrationDto: StockRegistrationDto,
+    @Body() createPurchaseDto: StockRegistrationDto,
     @Res() res: Response,
   ) {
-    try {
-      const stockPurchase =
-        await this.stockRegistrationService.createStockPurchase(
-          createStockRegistrationDto,
-        );
+    await this.stockPurchaseService.createStockPurchase(createPurchaseDto);
 
-      if (stockPurchase) {
-        return res
-          .status(201)
-          .send({ message: 'Stock registered successfully!' });
-      } else {
-        return res.status(404).send({ message: 'Bad Request' });
-      }
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return res
+      .status(HttpStatus.CREATED)
+      .send({ message: 'Successful purchase!' });
   }
 
   @Post('sale')
   @UsePipes(ValidationPipe)
   async createStockSale(
-    @Body() createStockRegistrationDto: StockRegistrationDto,
+    @Body() createStockSaleDto: StockRegistrationDto,
     @Res() res: Response,
   ) {
-    try {
-      await this.stockRegistrationService.createStockSale(
-        createStockRegistrationDto,
-      );
+    await this.stockSaleService.createStockSale(createStockSaleDto);
 
-      return res.status(201).send({ message: 'Successful sale!' });
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return res.status(HttpStatus.CREATED).send({ message: 'Successful sale!' });
   }
 }
