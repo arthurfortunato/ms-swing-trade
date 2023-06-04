@@ -6,47 +6,47 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
-import { Operations } from './operations.entity';
 import { Purchase } from './purchase.entity';
+import { Sale } from './sale.entity';
 
-@Entity({ name: 'sale' })
-export class Sale {
+@Entity({ name: 'operations' })
+export class Operations {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  ticket: string;
 
   @ManyToOne(() => Purchase, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'purchase_ticket_id' })
   purchase_ticket_id: Purchase;
 
-  @Column({ type: 'date' })
-  operation_date: Date;
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  total_purchase: number;
 
-  @Column()
-  ticket: string;
+  @ManyToOne(() => Sale, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'sale_ticket_id' })
+  sale_ticket_id: number;
 
   @Column({ type: 'decimal', precision: 19, scale: 2 })
-  value: number;
-
-  @Column({ type: 'integer' })
-  quantity: number;
+  total_sale: number;
 
   @Column({ type: 'decimal', precision: 19, scale: 2 })
-  tax: number;
-
-  @Column({ type: 'decimal', precision: 19, scale: 2 })
-  total_operation: number;
-
+  gross_profit: number;
+  
   @Column({ type: 'decimal', precision: 19, scale: 4 })
   irrf: number;
+
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  darf: number;
+
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  net_profit: number;
 
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @OneToMany(() => Operations, (operations) => operations.sale_ticket_id)
-  operations_purchase_id: Operations[];
 }

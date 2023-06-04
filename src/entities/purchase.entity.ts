@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { Operations } from './operations.entity';
 import { Sale } from './sale.entity';
 
 @Entity({ name: 'purchase' })
@@ -42,4 +43,7 @@ export class Purchase {
 
   @OneToMany(() => Sale, (sale) => sale.purchase_ticket_id)
   operations: Sale[];
+
+  @OneToMany(() => Operations, (operations) => operations.purchase_ticket_id)
+  operations_purchase_id: Operations[];
 }

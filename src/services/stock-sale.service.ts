@@ -7,6 +7,7 @@ import { TypeStock } from 'src/enums/type-stock.enum';
 import { Purchase } from 'src/entities/purchase.entity';
 import { Sale } from 'src/entities/sale.entity';
 import { AppError } from 'src/error/AppError';
+import { Operations } from 'src/entities/operations.entity';
 
 @Injectable()
 export class StockSaleService {
@@ -19,6 +20,8 @@ export class StockSaleService {
     private purchaseRepository: Repository<Purchase>,
     @InjectRepository(Sale)
     private saleRepository: Repository<Sale>,
+    @InjectRepository(Operations)
+    private operationsRepository: Repository<Operations>,
   ) {}
 
   async createStockSale(stockDto: StockRegistrationDto) {
@@ -80,6 +83,22 @@ export class StockSaleService {
         await this.purchaseRepository.save(correspondingPurchase);
         await this.stockRegistrationRepository.save(newStock);
         this.logger.log('Stock Purchase registered successfully!');
+
+        const operations = new Operations();
+        operations.purchase_ticket_id = correspondingPurchase;
+        operations.ticket = correspondingPurchase.ticket;
+        operations.total_purchase = correspondingPurchase.total_operation;
+        operations.sale_ticket_id = sale.id;
+        operations.total_sale = sale.total_operation;
+        operations.gross_profit =
+          sale.total_operation - correspondingPurchase.total_operation;
+        operations.irrf = sale.irrf;
+        operations.darf =
+          sale.total_operation >= 20000 && operations.gross_profit > 0
+            ? (operations.gross_profit - operations.irrf) * 0.15
+            : 0;
+        operations.net_profit = operations.gross_profit - operations.darf;
+        await this.operationsRepository.save(operations);
 
         quantityExecuted += quantitySold;
         quantityToSell -= quantitySold;
