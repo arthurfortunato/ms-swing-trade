@@ -117,6 +117,7 @@ export class StockSaleService {
     correspondingPurchase: Purchase,
   ): Sale {
     const sale = new Sale();
+    sale.type = TypeStock.SALE;
     sale.operation_date = stockDto.operation_date;
     sale.ticket = stockDto.ticket;
     sale.value = stockDto.value;

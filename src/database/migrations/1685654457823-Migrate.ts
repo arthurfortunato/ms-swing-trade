@@ -1,6 +1,10 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { Migrate1685622637246 } from './1685622637246-Migrate';
 
-export class Migrate1685654457823 implements MigrationInterface {
+export class Migrate1685654457823
+  extends Migrate1685622637246
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -17,46 +21,6 @@ export class Migrate1685654457823 implements MigrationInterface {
             name: 'status',
             type: 'enum',
             enum: ['OPEN', 'CLOSE'],
-          },
-          {
-            name: 'operation_date',
-            type: 'date',
-          },
-          {
-            name: 'ticket',
-            type: 'varchar',
-          },
-          {
-            name: 'value',
-            type: 'decimal',
-            precision: 19,
-            scale: 2,
-          },
-          {
-            name: 'quantity',
-            type: 'int',
-          },
-          {
-            name: 'tax',
-            type: 'decimal',
-            precision: 19,
-            scale: 2,
-          },
-          {
-            name: 'total_operation',
-            type: 'decimal',
-            precision: 19,
-            scale: 2,
-          },
-          {
-            name: 'created_at',
-            type: 'timestamp',
-            default: 'CURRENT_TIMESTAMP',
-          },
-          {
-            name: 'updated_at',
-            type: 'timestamp',
-            default: 'CURRENT_TIMESTAMP',
           },
         ],
       }),
