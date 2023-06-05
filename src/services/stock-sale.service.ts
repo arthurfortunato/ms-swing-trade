@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
 import { Repository } from 'typeorm';
+import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
 import { StockRegistration } from '../entities/stock-registration.entity';
 import { TypeStock } from 'src/enums/type-stock.enum';
 import { Purchase } from 'src/entities/purchase.entity';
@@ -10,6 +10,7 @@ import { AppError } from 'src/error/AppError';
 import { OperationsService } from './operations.service';
 
 const IRRF_RATE = 0.00005;
+const STOCK_STATUS_CLOSE = 'CLOSE';
 
 @Injectable()
 export class StockSaleService {
@@ -37,7 +38,6 @@ export class StockSaleService {
       this.logger.log(
         'Checking if there is a corresponding purchase with the ticket',
       );
-
       const correspondingPurchase = await this.getCorrespondingPurchase(ticket);
 
       if (correspondingPurchase) {
@@ -49,7 +49,7 @@ export class StockSaleService {
         correspondingPurchase.quantity -= quantitySold;
 
         if (correspondingPurchase.quantity === 0) {
-          correspondingPurchase.status = 'CLOSE';
+          correspondingPurchase.status = STOCK_STATUS_CLOSE;
         }
 
         const sale = this.createSaleObject(
@@ -59,15 +59,11 @@ export class StockSaleService {
           correspondingPurchase,
         );
 
-        this.logger.log('Save the sale and update the purchase');
-
         const newStock = this.createStockRegistrationObject(sale);
 
         await this.saleRepository.save(sale);
         await this.purchaseRepository.save(correspondingPurchase);
         await this.stockRegistrationRepository.save(newStock);
-        this.logger.log('Stock Purchase registered successfully!');
-
         await this.operationsService.createOperation(
           correspondingPurchase,
           sale,
@@ -113,22 +109,23 @@ export class StockSaleService {
     correspondingPurchase: Purchase,
   ): Sale {
     const sale = new Sale();
+    const { operation_date, ticket, value, tax } = stockDto;
     sale.type = TypeStock.SALE;
-    sale.operation_date = stockDto.operation_date;
-    sale.ticket = stockDto.ticket;
-    sale.value = stockDto.value;
+    sale.operation_date = operation_date;
+    sale.ticket = ticket;
+    sale.value = value;
     sale.quantity = quantitySold;
 
     if (!taxCharged) {
-      sale.tax = stockDto.tax;
+      sale.tax = tax;
       taxCharged = true;
     } else {
       sale.tax = 0;
     }
 
-    sale.total_operation = stockDto.value * quantitySold - sale.tax;
+    sale.total_operation = value * quantitySold - sale.tax;
     sale.purchase_ticket_id = correspondingPurchase;
-    sale.irrf = IRRF_RATE * quantitySold * stockDto.value;
+    sale.irrf = IRRF_RATE * quantitySold * value;
 
     return sale;
   }
