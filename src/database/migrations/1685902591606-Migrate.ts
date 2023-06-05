@@ -33,11 +33,6 @@ export class Migrate1685902591606 implements MigrationInterface {
             scale: 2,
           },
           {
-            name: 'created_at',
-            type: 'timestamp',
-            default: 'CURRENT_TIMESTAMP',
-          },
-          {
             name: 'sale_ticket_id',
             type: 'int',
           },
@@ -70,6 +65,21 @@ export class Migrate1685902591606 implements MigrationInterface {
             type: 'decimal',
             precision: 19,
             scale: 2,
+          },
+          {
+            name: 'invested_days',
+            type: 'int',
+          },
+          {
+            name: 'percentage',
+            type: 'decimal',
+            precision: 19,
+            scale: 2,
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+            default: 'CURRENT_TIMESTAMP',
           },
           {
             name: 'updated_at',

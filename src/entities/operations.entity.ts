@@ -34,7 +34,7 @@ export class Operations {
 
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   gross_profit: number;
-  
+
   @Column({ type: 'decimal', precision: 19, scale: 4 })
   irrf: number;
 
@@ -43,6 +43,12 @@ export class Operations {
 
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   net_profit: number;
+
+  @Column()
+  invested_days: number;
+
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  percentage: number;
 
   @CreateDateColumn()
   created_at: Date;

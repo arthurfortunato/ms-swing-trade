@@ -8,6 +8,7 @@ import { Purchase } from 'src/entities/purchase.entity';
 import { Sale } from 'src/entities/sale.entity';
 import { AppError } from 'src/error/AppError';
 import { Operations } from 'src/entities/operations.entity';
+import { differenceInDays } from 'date-fns';
 
 const IRRF_RATE = 0.00005;
 
@@ -162,6 +163,17 @@ export class StockSaleService {
         ? (operations.gross_profit - operations.irrf) * 0.15
         : 0;
     operations.net_profit = operations.gross_profit - operations.darf;
+    const oneDay = 24 * 60 * 60 * 1000;
+    const startDate = new Date(correspondingPurchase.operation_date);
+    const endDate = new Date(sale.operation_date);
+    const differenceInDays = Math.floor(
+      (endDate.getTime() - startDate.getTime()) / oneDay,
+    );
+    operations.invested_days = differenceInDays;
+    operations.percentage =
+      ((sale.total_operation - correspondingPurchase.total_operation) /
+        correspondingPurchase.total_operation) *
+      100;
 
     return operations;
   }
