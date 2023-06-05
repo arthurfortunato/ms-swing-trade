@@ -7,8 +7,7 @@ import { TypeStock } from 'src/enums/type-stock.enum';
 import { Purchase } from 'src/entities/purchase.entity';
 import { Sale } from 'src/entities/sale.entity';
 import { AppError } from 'src/error/AppError';
-import { Operations } from 'src/entities/operations.entity';
-import { differenceInDays } from 'date-fns';
+import { OperationsService } from './operations.service';
 
 const IRRF_RATE = 0.00005;
 
@@ -23,8 +22,7 @@ export class StockSaleService {
     private purchaseRepository: Repository<Purchase>,
     @InjectRepository(Sale)
     private saleRepository: Repository<Sale>,
-    @InjectRepository(Operations)
-    private operationsRepository: Repository<Operations>,
+    private operationsService: OperationsService,
   ) {}
 
   async createStockSale(stockDto: StockRegistrationDto) {
@@ -70,13 +68,10 @@ export class StockSaleService {
         await this.stockRegistrationRepository.save(newStock);
         this.logger.log('Stock Purchase registered successfully!');
 
-        const operations = this.createOperationsObject(
+        await this.operationsService.createOperation(
           correspondingPurchase,
           sale,
         );
-
-        await this.operationsRepository.save(operations);
-
         quantityExecuted += quantitySold;
         quantityToSell -= quantitySold;
 
@@ -143,38 +138,5 @@ export class StockSaleService {
       ...sale,
       type: TypeStock.SALE,
     });
-  }
-
-  private createOperationsObject(
-    correspondingPurchase: Purchase,
-    sale: Sale,
-  ): Operations {
-    const operations = new Operations();
-    operations.purchase_ticket_id = correspondingPurchase;
-    operations.ticket = correspondingPurchase.ticket;
-    operations.total_purchase = correspondingPurchase.total_operation;
-    operations.sale_ticket_id = sale.id;
-    operations.total_sale = sale.total_operation;
-    operations.gross_profit =
-      sale.total_operation - correspondingPurchase.total_operation;
-    operations.irrf = sale.irrf;
-    operations.darf =
-      sale.total_operation >= 20000 && operations.gross_profit > 0
-        ? (operations.gross_profit - operations.irrf) * 0.15
-        : 0;
-    operations.net_profit = operations.gross_profit - operations.darf;
-    const oneDay = 24 * 60 * 60 * 1000;
-    const startDate = new Date(correspondingPurchase.operation_date);
-    const endDate = new Date(sale.operation_date);
-    const differenceInDays = Math.floor(
-      (endDate.getTime() - startDate.getTime()) / oneDay,
-    );
-    operations.invested_days = differenceInDays;
-    operations.percentage =
-      ((sale.total_operation - correspondingPurchase.total_operation) /
-        correspondingPurchase.total_operation) *
-      100;
-
-    return operations;
   }
 }
