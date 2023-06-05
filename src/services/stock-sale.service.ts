@@ -9,6 +9,8 @@ import { Sale } from 'src/entities/sale.entity';
 import { AppError } from 'src/error/AppError';
 import { Operations } from 'src/entities/operations.entity';
 
+const IRRF_RATE = 0.00005;
+
 @Injectable()
 export class StockSaleService {
   private readonly logger = new Logger(StockSaleService.name);
@@ -37,10 +39,7 @@ export class StockSaleService {
         'Checking if there is a corresponding purchase with the ticket',
       );
 
-      const correspondingPurchase = await this.purchaseRepository.findOne({
-        where: { ticket, status: 'OPEN' },
-        order: { operation_date: 'ASC' },
-      });
+      const correspondingPurchase = await this.getCorrespondingPurchase(ticket);
 
       if (correspondingPurchase) {
         const quantitySold = Math.min(
@@ -54,50 +53,27 @@ export class StockSaleService {
           correspondingPurchase.status = 'CLOSE';
         }
 
-        const sale = new Sale();
-        sale.operation_date = stockDto.operation_date;
-        sale.ticket = stockDto.ticket;
-        sale.value = stockDto.value;
-        sale.quantity = quantitySold;
-
-        if (!taxCharged) {
-          sale.tax = stockDto.tax;
-          taxCharged = true;
-        } else {
-          sale.tax = 0;
-        }
-
-        sale.total_operation = stockDto.value * quantitySold - sale.tax;
-        sale.purchase_ticket_id = correspondingPurchase;
-        sale.irrf = 0.00005 * quantitySold * stockDto.value;
+        const sale = this.createSaleObject(
+          stockDto,
+          quantitySold,
+          taxCharged,
+          correspondingPurchase,
+        );
 
         this.logger.log('Save the sale and update the purchase');
 
-        const type = TypeStock.SALE;
-        const newStock = this.stockRegistrationRepository.create({
-          ...sale,
-          type,
-        });
+        const newStock = this.createStockRegistrationObject(sale);
 
         await this.saleRepository.save(sale);
         await this.purchaseRepository.save(correspondingPurchase);
         await this.stockRegistrationRepository.save(newStock);
         this.logger.log('Stock Purchase registered successfully!');
 
-        const operations = new Operations();
-        operations.purchase_ticket_id = correspondingPurchase;
-        operations.ticket = correspondingPurchase.ticket;
-        operations.total_purchase = correspondingPurchase.total_operation;
-        operations.sale_ticket_id = sale.id;
-        operations.total_sale = sale.total_operation;
-        operations.gross_profit =
-          sale.total_operation - correspondingPurchase.total_operation;
-        operations.irrf = sale.irrf;
-        operations.darf =
-          sale.total_operation >= 20000 && operations.gross_profit > 0
-            ? (operations.gross_profit - operations.irrf) * 0.15
-            : 0;
-        operations.net_profit = operations.gross_profit - operations.darf;
+        const operations = this.createOperationsObject(
+          correspondingPurchase,
+          sale,
+        );
+
         await this.operationsRepository.save(operations);
 
         quantityExecuted += quantitySold;
@@ -123,5 +99,69 @@ export class StockSaleService {
         );
       }
     }
+  }
+
+  private async getCorrespondingPurchase(
+    ticket: string,
+  ): Promise<Purchase | undefined> {
+    return this.purchaseRepository.findOne({
+      where: { ticket, status: 'OPEN' },
+      order: { operation_date: 'ASC' },
+    });
+  }
+
+  private createSaleObject(
+    stockDto: StockRegistrationDto,
+    quantitySold: number,
+    taxCharged: boolean,
+    correspondingPurchase: Purchase,
+  ): Sale {
+    const sale = new Sale();
+    sale.operation_date = stockDto.operation_date;
+    sale.ticket = stockDto.ticket;
+    sale.value = stockDto.value;
+    sale.quantity = quantitySold;
+
+    if (!taxCharged) {
+      sale.tax = stockDto.tax;
+      taxCharged = true;
+    } else {
+      sale.tax = 0;
+    }
+
+    sale.total_operation = stockDto.value * quantitySold - sale.tax;
+    sale.purchase_ticket_id = correspondingPurchase;
+    sale.irrf = IRRF_RATE * quantitySold * stockDto.value;
+
+    return sale;
+  }
+
+  private createStockRegistrationObject(sale: Sale): StockRegistration {
+    return this.stockRegistrationRepository.create({
+      ...sale,
+      type: TypeStock.SALE,
+    });
+  }
+
+  private createOperationsObject(
+    correspondingPurchase: Purchase,
+    sale: Sale,
+  ): Operations {
+    const operations = new Operations();
+    operations.purchase_ticket_id = correspondingPurchase;
+    operations.ticket = correspondingPurchase.ticket;
+    operations.total_purchase = correspondingPurchase.total_operation;
+    operations.sale_ticket_id = sale.id;
+    operations.total_sale = sale.total_operation;
+    operations.gross_profit =
+      sale.total_operation - correspondingPurchase.total_operation;
+    operations.irrf = sale.irrf;
+    operations.darf =
+      sale.total_operation >= 20000 && operations.gross_profit > 0
+        ? (operations.gross_profit - operations.irrf) * 0.15
+        : 0;
+    operations.net_profit = operations.gross_profit - operations.darf;
+
+    return operations;
   }
 }
