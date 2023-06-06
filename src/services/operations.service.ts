@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
-import { Operations } from 'src/entities/operations.entity';
-import { Purchase } from 'src/entities/purchase.entity';
-import { Sale } from 'src/entities/sale.entity';
-import { calculateDarf } from 'src/utils/calculateDarf';
-import { calculateDifferenceInDays } from 'src/utils/calculateDifferenceInDays';
-import { AppError } from 'src/error/AppError';
+import { Operations } from '../entities/operations.entity';
+import { Purchase } from '../entities/purchase.entity';
+import { Sale } from '../entities/sale.entity';
+import { calculateDarf } from '../utils/calculateDarf';
+import { calculateDifferenceInDays } from '../utils/calculateDifferenceInDays';
+import { AppError } from '../error/AppError';
 
 @Injectable()
 export class OperationsService {

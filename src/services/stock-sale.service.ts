@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
+import { StockRegistrationDto } from '../dtos/stock-registration.dto';
 import { StockRegistration } from '../entities/stock-registration.entity';
-import { TypeStock } from 'src/enums/type-stock.enum';
-import { Purchase } from 'src/entities/purchase.entity';
-import { Sale } from 'src/entities/sale.entity';
-import { AppError } from 'src/error/AppError';
+import { TypeStock } from '../enums/type-stock.enum';
+import { Purchase } from '../entities/purchase.entity';
+import { Sale } from '../entities/sale.entity';
+import { AppError } from '../error/AppError';
 import { OperationsService } from './operations.service';
 
 const IRRF_RATE = 0.00005;
