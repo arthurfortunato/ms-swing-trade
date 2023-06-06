@@ -12,7 +12,9 @@ import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
 import { StockPurchaseService } from 'src/services/stock-purchase.service';
 import { StockSaleService } from 'src/services/stock-sale.service';
 import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Purchase and Sale record')
 @Controller('stock-registration')
 export class StockRegistrationController {
   constructor(

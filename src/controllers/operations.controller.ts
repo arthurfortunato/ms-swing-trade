@@ -1,7 +1,9 @@
 import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
 import { OperationsService } from 'src/services/operations.service';
 import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Calculated Operations')
 @Controller('operations')
 export class OperationsController {
   constructor(private operationsService: OperationsService) {}
