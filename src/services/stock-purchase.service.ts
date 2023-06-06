@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
+import { StockRegistrationDto } from '../dtos/stock-registration.dto';
 import { Repository } from 'typeorm';
 import { StockRegistration } from '../entities/stock-registration.entity';
-import { TypeStock } from 'src/enums/type-stock.enum';
-import { Purchase } from 'src/entities/purchase.entity';
-import { StatusStock } from 'src/enums/status-stock.enum';
-import { AppError } from 'src/error/AppError';
+import { Purchase } from '../entities/purchase.entity';
+import { TypeStock } from '../enums/type-stock.enum';
+import { StatusStock } from '../enums/status-stock.enum';
+import { AppError } from '../error/AppError';
 
 @Injectable()
 export class StockPurchaseService {
@@ -45,7 +45,11 @@ export class StockPurchaseService {
 
       return newStock;
     } catch (error) {
-      throw new AppError('Error registered purchase', 500, error);
+      throw new AppError(
+        'Error registered purchase',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        error,
+      );
     }
   }
 
