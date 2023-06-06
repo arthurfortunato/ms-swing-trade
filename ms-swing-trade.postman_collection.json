@@ -1,0 +1,193 @@
+{
+	"info": {
+		"_postman_id": "53963316-dd33-49ab-aa2a-7693145ebe67",
+		"name": "ms-swing-trade",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "11872977"
+	},
+	"item": [
+		{
+			"name": "COMPRA",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"operation_date\": \"2023-06-01\",\r\n    \"ticket\": \"VALE3\",\r\n    \"value\": 65.16,\r\n    \"quantity\": 500,\r\n    \"tax\": 35.56\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/stock-registration/purchase"
+			},
+			"response": []
+		},
+		{
+			"name": "VENDA",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"operation_date\": \"2023-06-05\",\r\n    \"ticket\": \"VALE3\",\r\n    \"value\": 67.94,\r\n    \"quantity\": 500,\r\n    \"tax\": 38.47\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/stock-registration/sale"
+			},
+			"response": []
+		},
+		{
+			"name": "GET ALL OPERATIONS",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/operations"
+			},
+			"response": []
+		},
+		{
+			"name": "GET OPERATIONS  TICKET",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/operations/VALE3"
+			},
+			"response": []
+		},
+		{
+			"name": "GET OPERATIONS YEAR MONTH",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/operations/period/2023/6"
+			},
+			"response": []
+		},
+		{
+			"name": "GET OPERATIONS YEAR",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/operations/period/2023"
+			},
+			"response": []
+		},
+		{
+			"name": "GET ALL REGISTRATIONS",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/stock-registration"
+			},
+			"response": []
+		},
+		{
+			"name": "GET ALL REGISTRATION PURCHASE",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/stock-registration/purchase"
+			},
+			"response": []
+		},
+		{
+			"name": "GET ALL REGISTRATION SALE",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/stock-registration/sale"
+			},
+			"response": []
+		}
+	]
+}
