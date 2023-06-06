@@ -37,6 +37,10 @@ export class Migrate1685902591606 implements MigrationInterface {
             type: 'int',
           },
           {
+            name: 'sale_operation_date',
+            type: 'date',
+          },
+          {
             name: 'total_sale',
             type: 'decimal',
             precision: 19,

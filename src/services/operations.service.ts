@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Operations } from 'src/entities/operations.entity';
 import { Purchase } from 'src/entities/purchase.entity';
 import { Sale } from 'src/entities/sale.entity';
@@ -40,6 +40,7 @@ export class OperationsService {
       operations.total_purchase = purchaseTotalOperation;
       operations.sale_ticket_id = idSale;
       operations.total_sale = saleTotalOperation;
+      operations.sale_operation_date = sale.operation_date;
       operations.gross_profit = saleTotalOperation - purchaseTotalOperation;
       operations.irrf = saleIrrf;
 
@@ -69,5 +70,58 @@ export class OperationsService {
         error,
       );
     }
+  }
+
+  async getOperations() {
+    return this.operationsRepository.find();
+  }
+
+  async getOperationsByTicket(ticket: string): Promise<Operations[]> {
+    return this.operationsRepository.find({ where: { ticket } });
+  }
+
+  async getOperationsByYear(year: number): Promise<Operations[]> {
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year, 11, 31);
+
+    const operations = await this.operationsRepository.find({
+      where: {
+        sale_operation_date: Between(startDate, endDate),
+      },
+    });
+
+    if (operations.length === 0) {
+      throw new AppError(
+        'No operations in the selected period',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return operations;
+  }
+
+  async getOperationsByYearAndMonth(
+    year: number,
+    month: number,
+  ): Promise<Operations[]> {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+
+    const operations = await this.operationsRepository
+      .createQueryBuilder('operations')
+      .where('operations.sale_operation_date BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .getMany();
+
+    if (operations.length === 0) {
+      throw new AppError(
+        'No operations in the selected period',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return operations;
   }
 }

@@ -29,6 +29,9 @@ export class Operations {
   @JoinColumn({ name: 'sale_ticket_id' })
   sale_ticket_id: number;
 
+  @Column({ type: 'date' })
+  sale_operation_date: Date;
+
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   total_sale: number;
 

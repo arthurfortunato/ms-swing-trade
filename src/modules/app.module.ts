@@ -5,9 +5,9 @@ import { StockRegistrationModule } from './stock-registration.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), 
+    ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
-    StockRegistrationModule  
+    StockRegistrationModule,
   ],
   controllers: [],
   providers: [],
