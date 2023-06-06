@@ -73,11 +73,24 @@ export class OperationsService {
   }
 
   async getOperations() {
-    return this.operationsRepository.find();
+    const operations = await this.operationsRepository.find();
+
+    if (operations.length === 0) {
+      throw new AppError('No operations found', HttpStatus.NOT_FOUND);
+    }
+    return operations;
   }
 
   async getOperationsByTicket(ticket: string): Promise<Operations[]> {
-    return this.operationsRepository.find({ where: { ticket } });
+    const operationsByTicket = await this.operationsRepository.find({
+      where: { ticket },
+    });
+
+    if (operationsByTicket.length === 0) {
+      throw new AppError('No operations found', HttpStatus.NOT_FOUND);
+    }
+
+    return operationsByTicket;
   }
 
   async getOperationsByYear(year: number): Promise<Operations[]> {

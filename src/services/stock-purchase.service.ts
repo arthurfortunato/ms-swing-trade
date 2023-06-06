@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
 import { Repository } from 'typeorm';
@@ -47,5 +47,37 @@ export class StockPurchaseService {
     } catch (error) {
       throw new AppError('Error registered purchase', 500, error);
     }
+  }
+
+  async getAllRegistrations() {
+    const registrations = await this.stockRegistrationRepository.find();
+
+    if (registrations.length === 0) {
+      throw new AppError('No registrations found', HttpStatus.NOT_FOUND);
+    }
+    return registrations;
+  }
+
+  async getRegistrationsPurchase(): Promise<StockRegistration[]> {
+    const registrationsPurchase = await this.stockRegistrationRepository.find({
+      where: { type: TypeStock.PURCHASE },
+    });
+
+    if (registrationsPurchase.length === 0) {
+      throw new AppError('No registrations found', HttpStatus.NOT_FOUND);
+    }
+
+    return registrationsPurchase;
+  }
+
+  async getRegistrationsSale(): Promise<StockRegistration[]> {
+    const registrationsSale = await this.stockRegistrationRepository.find({
+      where: { type: TypeStock.SALE },
+    });
+
+    if (registrationsSale.length === 0) {
+      throw new AppError('No registrations found', HttpStatus.NOT_FOUND);
+    }
+    return registrationsSale;
   }
 }

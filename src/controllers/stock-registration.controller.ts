@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   Res,
@@ -41,5 +42,27 @@ export class StockRegistrationController {
     await this.stockSaleService.createStockSale(createStockSaleDto);
 
     return res.status(HttpStatus.CREATED).send({ message: 'Successful sale!' });
+  }
+
+  @Get()
+  async getAllRegistrations(@Res() res: Response) {
+    const operations = await this.stockPurchaseService.getAllRegistrations();
+
+    return res.status(HttpStatus.OK).json(operations);
+  }
+
+  @Get('purchase')
+  async getRegistrationsPurchase(@Res() res: Response) {
+    const operations =
+      await this.stockPurchaseService.getRegistrationsPurchase();
+
+    return res.status(HttpStatus.OK).json(operations);
+  }
+
+  @Get('sale')
+  async getRegistrationsSale(@Res() res: Response) {
+    const operations = await this.stockPurchaseService.getRegistrationsSale();
+
+    return res.status(HttpStatus.OK).json(operations);
   }
 }
