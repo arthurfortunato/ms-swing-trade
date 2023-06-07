@@ -65,7 +65,7 @@ export class OperationsService {
       this.logger.log('Operation saved successfully.');
     } catch (error) {
       throw new AppError(
-        'Error  occurred while creating operation',
+        'Error occurred while creating operation',
         500,
         error,
       );
