@@ -8,9 +8,9 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { StockRegistrationDto } from 'src/dtos/stock-registration.dto';
-import { StockPurchaseService } from 'src/services/stock-purchase.service';
-import { StockSaleService } from 'src/services/stock-sale.service';
+import { StockRegistrationDto } from '../dtos/stock-registration.dto';
+import { StockPurchaseService } from '../services/stock-purchase.service';
+import { StockSaleService } from '../services/stock-sale.service';
 import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 

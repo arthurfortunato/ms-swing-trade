@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OperationsController } from 'src/controllers/operations.controller';
-import { StockRegistrationController } from 'src/controllers/stock-registration.controller';
-import { Operations } from 'src/entities/operations.entity';
-import { Purchase } from 'src/entities/purchase.entity';
-import { Sale } from 'src/entities/sale.entity';
-import { StockRegistration } from 'src/entities/stock-registration.entity';
-import { OperationsService } from 'src/services/operations.service';
-import { StockPurchaseService } from 'src/services/stock-purchase.service';
-import { StockSaleService } from 'src/services/stock-sale.service';
+import { OperationsController } from '../controllers/operations.controller';
+import { StockRegistrationController } from '../controllers/stock-registration.controller';
+import { Operations } from '../entities/operations.entity';
+import { Purchase } from '../entities/purchase.entity';
+import { Sale } from '../entities/sale.entity';
+import { StockRegistration } from '../entities/stock-registration.entity';
+import { OperationsService } from '../services/operations.service';
+import { StockPurchaseService } from '../services/stock-purchase.service';
+import { StockSaleService } from '../services/stock-sale.service';
 
 @Module({
   imports: [

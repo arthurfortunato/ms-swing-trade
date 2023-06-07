@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
-import { OperationsService } from 'src/services/operations.service';
+import { OperationsService } from '../services/operations.service';
 import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 
