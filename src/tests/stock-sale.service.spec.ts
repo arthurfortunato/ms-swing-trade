@@ -13,8 +13,8 @@ import { OperationsService } from '../services/operations.service';
 import { StockSaleService } from '../services/stock-sale.service';
 import { Operations } from '../entities/operations.entity';
 
-const IRRF_RATE = 0.00005;
-const STOCK_STATUS_CLOSE = 'CLOSE';
+const STOCK_STATUS_CLOSE = StatusStock.CLOSE;
+const STOCK_STATUS_OPEN = StatusStock.OPEN;
 
 describe('StockSaleService', () => {
   let service: StockSaleService;
@@ -61,61 +61,54 @@ describe('StockSaleService', () => {
   });
 
   describe('createStockSale', () => {
-    it('should create a new stock sale and return the created entity', async () => {
-      const stockDto: StockRegistrationDto = {
-        ticket: 'VALE3',
-        operation_date: new Date('2023-06-08'),
-        value: 70,
-        quantity: 300,
-        tax: 20,
-      };
-      const { ticket, operation_date, value, quantity, tax } = stockDto;
+    const stockDto: StockRegistrationDto = {
+      ticket: 'VALE3',
+      operation_date: new Date('2023-06-08'),
+      value: 70,
+      quantity: 300,
+      tax: 20,
+    };
 
-      const createdStockRegistration = new StockRegistration();
-      createdStockRegistration.ticket = ticket;
-      createdStockRegistration.operation_date = operation_date;
-      createdStockRegistration.value = value;
-      createdStockRegistration.quantity = quantity;
-      createdStockRegistration.tax = tax;
-      createdStockRegistration.type = TypeStock.SALE;
-
+    it(`should create a stock sale and update corresponding purchase when 
+    a matching purchase exists`, async () => {
       const correspondingPurchase = new Purchase();
       correspondingPurchase.quantity = 300;
-      correspondingPurchase.status = StatusStock.OPEN;
-
-      const savedPurchase = new Purchase();
-      savedPurchase.quantity = 0;
-      savedPurchase.status = STOCK_STATUS_CLOSE;
+      correspondingPurchase.status = STOCK_STATUS_OPEN;
 
       const createdSale = new Sale();
       createdSale.type = TypeStock.SALE;
-      createdSale.operation_date = operation_date;
-      createdSale.ticket = ticket;
-      createdSale.value = value;
-      createdSale.quantity = 300;
-      createdSale.tax = tax;
-      createdSale.total_operation = value * 300 - tax;
+      createdSale.operation_date = new Date('2023-06-08');
+      createdSale.ticket = stockDto.ticket;
+      createdSale.value = stockDto.value;
+      createdSale.quantity = correspondingPurchase.quantity;
+      createdSale.tax = stockDto.tax;
+      createdSale.total_operation =
+        stockDto.value * correspondingPurchase.quantity - stockDto.tax;
       createdSale.purchase_ticket_id = correspondingPurchase;
-      createdSale.irrf = IRRF_RATE * 300 * value;
+      createdSale.irrf =
+        0.00005 * correspondingPurchase.quantity * stockDto.value;
 
       jest
         .spyOn(purchaseRepository, 'findOne')
         .mockResolvedValueOnce(correspondingPurchase);
 
-      jest
-        .spyOn(stockRegistrationRepository, 'create')
-        .mockReturnValueOnce(createdStockRegistration);
-      jest
-        .spyOn(stockRegistrationRepository, 'save')
-        .mockResolvedValue(createdStockRegistration);
+      jest.spyOn(saleRepository, 'create').mockReturnValueOnce({
+        ...createdSale,
+        type: TypeStock.SALE,
+      });
+
+      jest.spyOn(saleRepository, 'save').mockResolvedValue(createdSale);
 
       jest
         .spyOn(purchaseRepository, 'save')
         .mockResolvedValueOnce(correspondingPurchase);
 
-      jest.spyOn(saleRepository, 'create').mockReturnValueOnce(createdSale);
-
-      jest.spyOn(saleRepository, 'save').mockResolvedValue(createdSale);
+      jest
+        .spyOn(stockRegistrationRepository, 'create')
+        .mockReturnValueOnce(createdSale);
+      jest
+        .spyOn(stockRegistrationRepository, 'save')
+        .mockResolvedValue(createdSale);
 
       jest
         .spyOn(operationsService, 'createOperation')
@@ -124,35 +117,31 @@ describe('StockSaleService', () => {
       await service.createStockSale(stockDto);
 
       expect(purchaseRepository.findOne).toHaveBeenCalledWith({
-        where: { ticket: ticket, status: 'OPEN' },
+        where: { ticket: 'VALE3', status: STOCK_STATUS_OPEN },
         order: { operation_date: 'ASC' },
       });
-      expect(stockRegistrationRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          ...createdStockRegistration,
-          type: TypeStock.SALE,
-        }),
-      );
-      expect(stockRegistrationRepository.save).toHaveBeenCalledWith(
-        createdStockRegistration,
-      );
-      expect(purchaseRepository.save).toHaveBeenCalledWith(savedPurchase);
+
       expect(saleRepository.save).toHaveBeenCalledWith(createdSale);
+      expect(createdSale.total_operation).toBe(20980);
+      expect(createdSale.irrf).toBe(1.05);
+
+      expect(purchaseRepository.save).toHaveBeenCalledWith(
+        correspondingPurchase,
+      );
+      expect(correspondingPurchase.quantity).toBe(0);
+      expect(correspondingPurchase.status).toBe(STOCK_STATUS_CLOSE);
+
+      expect(stockRegistrationRepository.save).toHaveBeenCalledWith(
+        createdSale,
+      );
+
       expect(operationsService.createOperation).toHaveBeenCalledWith(
-        savedPurchase,
+        correspondingPurchase,
         createdSale,
       );
     });
 
     it('should throw an AppError when there is no corresponding purchase', async () => {
-      const stockDto: StockRegistrationDto = {
-        ticket: 'VALE3',
-        operation_date: new Date('2023-06-08'),
-        value: 70,
-        quantity: 300,
-        tax: 20,
-      };
-
       jest
         .spyOn(purchaseRepository, 'findOne')
         .mockResolvedValueOnce(undefined);
@@ -170,41 +159,11 @@ describe('StockSaleService', () => {
     });
 
     it('should throw an AppError when quantityExecuted is less than requested quantity', async () => {
-      const stockDto: StockRegistrationDto = {
-        ticket: 'VALE3',
-        operation_date: new Date('2023-06-08'),
-        value: 70,
-        quantity: 500,
-        tax: 20,
-      };
-      const { ticket, operation_date, value, quantity, tax } = stockDto;
-
-      const createdStockRegistration = new StockRegistration();
-      createdStockRegistration.ticket = ticket;
-      createdStockRegistration.operation_date = operation_date;
-      createdStockRegistration.value = value;
-      createdStockRegistration.quantity = quantity;
-      createdStockRegistration.tax = tax;
-      createdStockRegistration.type = TypeStock.SALE;
-
       const correspondingPurchase = new Purchase();
-      correspondingPurchase.quantity = 300;
-      correspondingPurchase.status = StatusStock.OPEN;
-
-      const savedPurchase = new Purchase();
-      savedPurchase.quantity = 200;
-      savedPurchase.status = 'OPEN';
+      correspondingPurchase.quantity = 200;
+      correspondingPurchase.status = STOCK_STATUS_OPEN;
 
       const createdSale = new Sale();
-      createdSale.type = TypeStock.SALE;
-      createdSale.operation_date = operation_date;
-      createdSale.ticket = ticket;
-      createdSale.value = value;
-      createdSale.quantity = 300;
-      createdSale.tax = tax;
-      createdSale.total_operation = value * 300 - tax;
-      createdSale.purchase_ticket_id = correspondingPurchase;
-      createdSale.irrf = IRRF_RATE * 300 * value;
 
       jest
         .spyOn(purchaseRepository, 'findOne')
@@ -212,10 +171,10 @@ describe('StockSaleService', () => {
 
       jest
         .spyOn(stockRegistrationRepository, 'create')
-        .mockReturnValueOnce(createdStockRegistration);
+        .mockReturnValueOnce(createdSale);
       jest
         .spyOn(stockRegistrationRepository, 'save')
-        .mockResolvedValue(createdStockRegistration);
+        .mockResolvedValue(createdSale);
 
       jest
         .spyOn(purchaseRepository, 'save')
@@ -233,7 +192,7 @@ describe('StockSaleService', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(AppError);
         expect(error.message).toBe(
-          'It was possible to perform only 300 actions out of the 500 requested',
+          'It was possible to perform only 200 actions out of the 300 requested',
         );
         expect(error.statusCode).toBe(HttpStatus.PARTIAL_CONTENT);
       }
@@ -246,7 +205,7 @@ describe('StockSaleService', () => {
 
       const correspondingPurchase = new Purchase();
       correspondingPurchase.quantity = 100;
-      correspondingPurchase.status = 'OPEN';
+      correspondingPurchase.status = STOCK_STATUS_OPEN;
 
       jest
         .spyOn(purchaseRepository, 'findOne')
