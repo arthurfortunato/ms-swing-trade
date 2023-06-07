@@ -33,22 +33,36 @@ describe('OperationsService', () => {
     it('should create an operation', async () => {
       const correspondingPurchase = new Purchase();
       correspondingPurchase.ticket = 'VALE3';
-      correspondingPurchase.total_operation = 1000;
+      correspondingPurchase.total_operation = 25000;
       correspondingPurchase.operation_date = new Date('2023-06-08');
 
       const sale = new Sale();
       sale.id = 1;
-      sale.total_operation = 1200;
+      sale.total_operation = 26000;
       sale.irrf = 100;
       sale.operation_date = new Date('2023-06-10');
 
+      const operations = new Operations();
+      operations.purchase_ticket_id = correspondingPurchase;
+      operations.ticket = 'VALE3';
+      operations.total_purchase = 25000;
+      operations.sale_ticket_id = 1;
+      operations.total_sale = 26000;
+      operations.sale_operation_date = new Date('2023-06-10');
+      operations.irrf = 100;
+      operations.gross_profit = 1000;
+      operations.darf = 135;
+      operations.net_profit = 865;
+      operations.invested_days = 2;
+      operations.percentage = 4;
+
       jest
         .spyOn(operationsRepository, 'save')
-        .mockResolvedValueOnce({} as Operations);
+        .mockResolvedValueOnce(operations);
 
-      await expect(
-        service.createOperation(correspondingPurchase, sale),
-      ).resolves.not.toThrow();
+      await service.createOperation(correspondingPurchase, sale);
+
+      expect(operationsRepository.save).toHaveBeenCalledWith(operations);
     });
 
     it('should throw an AppError when an error occurs', async () => {
