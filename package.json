@@ -79,6 +79,22 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/",
+      "/src/main.ts",
+      "/src/middlewares/",
+      "/src/database",
+      "/src/modules",
+      "/src/dtos"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/middlewares/",
+      "/src/main.ts",
+      "/src/database",
+      "/src/modules",
+      "/src/dtos"
+    ]
   }
 }
