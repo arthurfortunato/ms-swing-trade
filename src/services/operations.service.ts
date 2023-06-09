@@ -64,11 +64,7 @@ export class OperationsService {
       await this.operationsRepository.save(operations);
       this.logger.log('Operation saved successfully.');
     } catch (error) {
-      throw new AppError(
-        'Error occurred while creating operation',
-        500,
-        error,
-      );
+      throw new AppError('Error occurred while creating operation', 500, error);
     }
   }
 

@@ -140,9 +140,9 @@ describe('StockRegistrationController', () => {
         .mockResolvedValue(operations);
 
       await controller.getRegistrationsPurchase(response);
-      
+
       const numberOfPurchases = operations.filter(
-        operation => operation instanceof Purchase,
+        (operation) => operation instanceof Purchase,
       ).length;
 
       expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
@@ -166,9 +166,9 @@ describe('StockRegistrationController', () => {
         .mockResolvedValue(operations);
 
       await controller.getRegistrationsSale(response as any);
-      
+
       const numberOfSales = operations.filter(
-        operation => operation instanceof Sale,
+        (operation) => operation instanceof Sale,
       ).length;
 
       expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);

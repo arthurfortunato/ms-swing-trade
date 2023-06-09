@@ -32,7 +32,7 @@ export class StockSaleService {
     const { ticket, quantity } = stockDto;
     let quantityToSell = quantity;
     let quantityExecuted = 0;
-    let taxCharged = false;
+    const taxCharged = false;
 
     while (quantityToSell > 0) {
       this.logger.log(

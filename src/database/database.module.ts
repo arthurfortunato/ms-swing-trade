@@ -11,7 +11,7 @@ import { dataSource } from './configs/database.config';
       dataSourceFactory: async () => {
         await dataSource.initialize();
         return dataSource;
-      }
+      },
     }),
   ],
 })

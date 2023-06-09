@@ -28,9 +28,7 @@ export class OperationsController {
   }
 
   @Get('/period/:year')
-  async getOperationsByYear(
-    @Res() res: Response, 
-    @Param('year') year: number) {
+  async getOperationsByYear(@Res() res: Response, @Param('year') year: number) {
     const operations = await this.operationsService.getOperationsByYear(year);
     return res.status(HttpStatus.OK).json(operations);
   }
