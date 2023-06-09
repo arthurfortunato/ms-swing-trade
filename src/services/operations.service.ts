@@ -64,6 +64,7 @@ export class OperationsService {
       await this.operationsRepository.save(operations);
       this.logger.log('Operation saved successfully.');
     } catch (error) {
+      this.logger.error('Error occurred while creating operation', error);
       throw new AppError('Error occurred while creating operation', 500, error);
     }
   }
@@ -72,6 +73,7 @@ export class OperationsService {
     const operations = await this.operationsRepository.find();
 
     if (operations.length === 0) {
+      this.logger.error('No operations found');
       throw new AppError('No operations found', HttpStatus.NOT_FOUND);
     }
     return operations;
@@ -83,6 +85,7 @@ export class OperationsService {
     });
 
     if (operationsByTicket.length === 0) {
+      this.logger.error('No operations found');
       throw new AppError('No operations found', HttpStatus.NOT_FOUND);
     }
 

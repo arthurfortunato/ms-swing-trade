@@ -57,6 +57,7 @@ export class StockPurchaseService {
     const registrations = await this.stockRegistrationRepository.find();
 
     if (registrations.length === 0) {
+      this.logger.error('No registrations found');
       throw new AppError('No registrations found', HttpStatus.NOT_FOUND);
     }
     return registrations;
@@ -68,6 +69,7 @@ export class StockPurchaseService {
     });
 
     if (registrationsPurchase.length === 0) {
+      this.logger.error('No registrations found');
       throw new AppError('No registrations found', HttpStatus.NOT_FOUND);
     }
 
@@ -80,6 +82,7 @@ export class StockPurchaseService {
     });
 
     if (registrationsSale.length === 0) {
+      this.logger.error('No registrations found');
       throw new AppError('No registrations found', HttpStatus.NOT_FOUND);
     }
     return registrationsSale;

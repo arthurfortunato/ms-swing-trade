@@ -79,12 +79,18 @@ export class StockSaleService {
         quantityExecuted < stockDto.quantity
       ) {
         quantityToSell = 0;
+        this.logger.warn(
+          `It was possible to perform only ${quantityExecuted} actions out of the ${quantity} requested`,
+        );
         throw new AppError(
           `It was possible to perform only ${quantityExecuted} actions out of the ${quantity} requested`,
           HttpStatus.PARTIAL_CONTENT,
         );
       } else {
         quantityToSell = 0;
+        this.logger.error(
+          'It was not possible to find a purchase with the corresponding ticket in the "Open" state',
+        );
         throw new AppError(
           'It was not possible to find a purchase with the corresponding ticket in the "Open" state',
           HttpStatus.NOT_FOUND,

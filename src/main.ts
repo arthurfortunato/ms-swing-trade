@@ -2,8 +2,9 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
-import { Logger } from '@nestjs/common';
+import { HttpStatus, Logger } from '@nestjs/common';
 import { globalErrors } from './middlewares/globalErrors';
+import { AppError } from './error/AppError';
 
 const logger = new Logger('bootstrap');
 
@@ -37,5 +38,10 @@ async function bootstrap() {
 }
 
 bootstrap().catch((error) => {
-  logger.log('Unable to connect to the database', error);
+  logger.error('Unable to connect to the database', error);
+  throw new AppError(
+    'Unable to connect to the database',
+    HttpStatus.INTERNAL_SERVER_ERROR,
+    error,
+  );
 });
