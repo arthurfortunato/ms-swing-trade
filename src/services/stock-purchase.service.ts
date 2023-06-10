@@ -61,7 +61,7 @@ export class StockPurchaseService {
       throw new AppError('No registrations found', HttpStatus.NOT_FOUND);
     }
     return registrations;
-  } 
+  }
 
   async getRegistrationsByTicket(ticket: string): Promise<StockRegistration[]> {
     const operationsByTicket = await this.stockRegistrationRepository.find({
