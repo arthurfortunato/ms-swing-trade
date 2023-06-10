@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   Res,
   UsePipes,
@@ -49,6 +50,18 @@ export class StockRegistrationController {
   @Get()
   async getAllRegistrations(@Res() res: Response) {
     const operations = await this.stockPurchaseService.getAllRegistrations();
+
+    return res.status(HttpStatus.OK).json(operations);
+  }
+
+  @Get('/:ticket')
+  async getRegistrationsByTicket(
+    @Res() res: Response,
+    @Param('ticket') ticket: string,
+  ) {
+    const operations = await this.stockPurchaseService.getRegistrationsByTicket(
+      ticket,
+    );
 
     return res.status(HttpStatus.OK).json(operations);
   }

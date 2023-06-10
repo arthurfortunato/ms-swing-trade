@@ -113,16 +113,49 @@ describe('StockRegistrationController', () => {
         json: jest.fn(),
       };
 
-      const sale = [new Sale(), new Sale()];
+      const registrations = [new StockRegistration(), new StockRegistration()];
 
       jest
         .spyOn(purchaseService, 'getAllRegistrations')
-        .mockResolvedValue(sale);
+        .mockResolvedValue(registrations);
 
       await controller.getAllRegistrations(response as any);
 
       expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(response.json).toHaveBeenCalledWith(sale);
+      expect(response.json).toHaveBeenCalledWith(registrations);
+    });
+  });
+
+  describe('getRegistrationsByTicket', () => {
+    it('should return registrations by ticket', async () => {
+      const response = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+      const ticket = 'VALE3';
+      const registration1 = new StockRegistration();
+      registration1.ticket = 'VALE3';
+      const registration2 = new StockRegistration();
+      registration2.ticket = 'VALE3';
+      const registration3 = new StockRegistration();
+      registration3.ticket = 'VALE4';
+
+      const registrations = [registration1, registration2, registration3];
+
+      jest
+        .spyOn(purchaseService, 'getRegistrationsByTicket')
+        .mockResolvedValue(registrations);
+
+      await controller.getRegistrationsByTicket(response as any, ticket);
+
+      expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(response.json).toHaveBeenCalledWith(registrations);
+      expect(purchaseService.getRegistrationsByTicket).toHaveBeenCalledWith(
+        ticket,
+      );
+      expect(purchaseService.getRegistrationsByTicket).not.toHaveBeenCalledWith(
+        'VALE4',
+      );
     });
   });
 

@@ -5,6 +5,7 @@ import { AppModule } from './modules/app.module';
 import { HttpStatus, Logger } from '@nestjs/common';
 import { globalErrors } from './middlewares/globalErrors';
 import { AppError } from './error/AppError';
+import * as cors from 'cors';
 
 const logger = new Logger('bootstrap');
 
@@ -12,6 +13,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const PORT = process.env.APP_PORT;
   const HOST = process.env.APP_HOST;
+
+  app.use(cors());
 
   const config = new DocumentBuilder()
     .setTitle('Swing Trade')

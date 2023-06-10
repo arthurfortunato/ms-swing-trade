@@ -145,6 +145,36 @@ describe('StockPurchaseService', () => {
     });
   });
 
+  describe('getRegistrationsByTicket', () => {
+    it('should return registrations with the specified ticket', async () => {
+      const ticket = 'VALE3';
+      const registrations = [new StockRegistration(), new StockRegistration()];
+
+      jest
+        .spyOn(stockRegistrationRepository, 'find')
+        .mockResolvedValueOnce(registrations);
+
+      const result = await service.getRegistrationsByTicket(ticket);
+
+      expect(stockRegistrationRepository.find).toHaveBeenCalled();
+      expect(result).toEqual(registrations);
+    });
+
+    it('should throw an AppError when no registrations by ticket are found', async () => {
+      jest.spyOn(stockRegistrationRepository, 'find').mockResolvedValueOnce([]);
+
+      try {
+        const ticket = 'PETR4';
+        await service.getRegistrationsByTicket(ticket);
+        fail('Expected an AppError to be thrown');
+      } catch (error) {
+        expect(error).toBeInstanceOf(AppError);
+        expect(error.message).toBe('No registrations found');
+        expect(error.statusCode).toBe(HttpStatus.NOT_FOUND);
+      }
+    });
+  });
+
   describe('getRegistrationsPurchase', () => {
     it('should return an array of purchase registrations', async () => {
       const registrationsPurchase = [
