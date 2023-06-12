@@ -93,6 +93,19 @@ export class StockPurchaseService {
     return registrationsPurchase;
   }
 
+  async getRegistrationsPurchaseActive() {
+    const purchaseActive = await this.purchaseRepository.find({
+      where: { status: 'OPEN' },
+    });
+
+    if (purchaseActive.length === 0) {
+      this.logger.error('No active purchases found');
+      throw new AppError('No active purchases found', HttpStatus.NOT_FOUND);
+    }
+
+    return purchaseActive;
+  }
+
   async getRegistrationsSale(): Promise<StockRegistration[]> {
     const registrationsSale = await this.stockRegistrationRepository.find({
       where: { type: TypeStock.SALE },

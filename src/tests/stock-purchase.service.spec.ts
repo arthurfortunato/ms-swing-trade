@@ -207,6 +207,44 @@ describe('StockPurchaseService', () => {
     });
   });
 
+  describe('getRegistrationsPurchaseActive', () => {
+    it('should return an array of active purchase registrations', async () => {
+      const purchase1 = new Purchase();
+      purchase1.status = 'OPEN';
+      const purchase2 = new Purchase();
+      purchase2.status = 'OPEN';
+      const purchase3 = new Purchase();
+      purchase3.status = 'CLOSE';
+
+      const activePurchase = [purchase1, purchase2, purchase3];
+
+      jest
+        .spyOn(purchaseRepository, 'find')
+        .mockResolvedValue(activePurchase);
+
+      const result = await service.getRegistrationsPurchaseActive();
+
+      expect(purchaseRepository.find).toHaveBeenCalledWith({
+        where: { status: 'OPEN' },
+      });
+      
+      expect(result).toEqual(activePurchase);
+    });
+
+    it('should throw an AppError if no active purchase registrations are found', async () => {
+      jest.spyOn(purchaseRepository, 'find').mockResolvedValue([]);
+
+      try {
+        await service.getRegistrationsPurchaseActive();
+        fail('Expected an AppError to be thrown');
+      } catch (error) {
+        expect(error).toBeInstanceOf(AppError);
+        expect(error.message).toBe('No active purchases found');
+        expect(error.statusCode).toBe(HttpStatus.NOT_FOUND);
+      }
+    });
+  });
+
   describe('getRegistrationsSale', () => {
     it('should return an array of sale registrations', async () => {
       const registrationsSale = [

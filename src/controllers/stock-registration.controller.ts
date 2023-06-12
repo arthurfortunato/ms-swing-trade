@@ -54,7 +54,7 @@ export class StockRegistrationController {
     return res.status(HttpStatus.OK).json(operations);
   }
 
-  @Get('/:ticket')
+  @Get('ticket/:ticket')
   async getRegistrationsByTicket(
     @Res() res: Response,
     @Param('ticket') ticket: string,
@@ -70,6 +70,14 @@ export class StockRegistrationController {
   async getRegistrationsPurchase(@Res() res: Response) {
     const operations =
       await this.stockPurchaseService.getRegistrationsPurchase();
+
+    return res.status(HttpStatus.OK).json(operations);
+  }
+
+  @Get('purchase-active')
+  async getRegistrationsPurchaseActive(@Res() res: Response) {
+    const operations =
+      await this.stockPurchaseService.getRegistrationsPurchaseActive();
 
     return res.status(HttpStatus.OK).json(operations);
   }

@@ -185,6 +185,33 @@ describe('StockRegistrationController', () => {
     });
   });
 
+  describe('getRegistrationsPurchaseActive', () => {
+    it('should return all active purchases registrations', async () => {
+      const response = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      const purchase1 = new Purchase();
+      purchase1.status = 'OPEN';
+      const purchase2 = new Purchase();
+      purchase2.status = 'OPEN';
+      const purchase3 = new Purchase();
+      purchase3.status = 'CLOSE';
+
+      const activePurchase = [purchase1, purchase2, purchase3];
+
+      jest
+        .spyOn(purchaseService, 'getRegistrationsPurchaseActive')
+        .mockResolvedValueOnce(activePurchase);
+
+      await controller.getRegistrationsPurchaseActive(response as any);
+
+      expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(response.json).toHaveBeenCalledWith(activePurchase);
+    });
+  });
+
   describe('getRegistrationsSale', () => {
     it('should return all sales registrations', async () => {
       const response = {
