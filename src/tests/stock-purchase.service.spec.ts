@@ -218,16 +218,14 @@ describe('StockPurchaseService', () => {
 
       const activePurchase = [purchase1, purchase2, purchase3];
 
-      jest
-        .spyOn(purchaseRepository, 'find')
-        .mockResolvedValue(activePurchase);
+      jest.spyOn(purchaseRepository, 'find').mockResolvedValue(activePurchase);
 
       const result = await service.getRegistrationsPurchaseActive();
 
       expect(purchaseRepository.find).toHaveBeenCalledWith({
         where: { status: 'OPEN' },
       });
-      
+
       expect(result).toEqual(activePurchase);
     });
 
