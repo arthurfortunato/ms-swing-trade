@@ -54,7 +54,11 @@ export class StockPurchaseService {
   }
 
   async getAllRegistrations() {
-    const registrations = await this.stockRegistrationRepository.find();
+    const registrations = await this.stockRegistrationRepository.find({
+      order: {
+        operation_date: 'ASC',
+      },
+    });
 
     if (registrations.length === 0) {
       this.logger.error('No registrations found');
