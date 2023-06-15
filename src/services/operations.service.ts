@@ -53,7 +53,7 @@ export class OperationsService {
       operations.net_profit =
         operations.darf > 0
           ? operations.gross_profit - operations.darf
-          : operations.gross_profit + operations.irrf;
+          : operations.gross_profit - operations.irrf;
 
       const investedDays = calculateDifferenceInDays(
         purchaseOperationDate,
