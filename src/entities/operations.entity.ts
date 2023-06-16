@@ -47,6 +47,9 @@ export class Operations {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   net_profit: number;
 
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  loss_compensate: number;
+
   @Column()
   invested_days: number;
 

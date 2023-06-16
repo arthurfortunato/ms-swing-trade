@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, LessThan, Repository } from 'typeorm';
 import { Operations } from '../entities/operations.entity';
 import { Purchase } from '../entities/purchase.entity';
 import { Sale } from '../entities/sale.entity';
@@ -44,6 +44,25 @@ export class OperationsService {
       operations.gross_profit = saleTotalOperation - purchaseTotalOperation;
       operations.irrf = saleIrrf;
 
+      const previousOperation = await this.operationsRepository.findOne({
+        where: {
+          loss_compensate: LessThan(0),
+        },
+        order: {
+          sale_operation_date: 'DESC',
+        },
+      });
+
+      if (previousOperation) {
+        const currentGrossProfit = previousOperation.loss_compensate;
+
+        operations.gross_profit -= currentGrossProfit * -1;
+
+        previousOperation.loss_compensate -= currentGrossProfit;
+
+        await this.operationsRepository.save(previousOperation);
+      }
+
       operations.darf = calculateDarf(
         saleTotalOperation,
         operations.gross_profit,
@@ -51,9 +70,14 @@ export class OperationsService {
       );
 
       operations.net_profit =
-        operations.darf > 0
+        operations.gross_profit > 0
           ? operations.gross_profit - operations.darf
-          : operations.gross_profit - operations.irrf;
+          : 0;
+
+      operations.loss_compensate =
+        operations.gross_profit < 0
+          ? operations.gross_profit - operations.irrf
+          : 0;
 
       const investedDays = calculateDifferenceInDays(
         purchaseOperationDate,

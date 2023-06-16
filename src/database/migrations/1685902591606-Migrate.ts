@@ -71,6 +71,12 @@ export class Migrate1685902591606 implements MigrationInterface {
             scale: 2,
           },
           {
+            name: 'loss_compensate',
+            type: 'decimal',
+            precision: 19,
+            scale: 2,
+          },
+          {
             name: 'invested_days',
             type: 'int',
           },

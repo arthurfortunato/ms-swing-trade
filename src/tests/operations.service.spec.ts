@@ -42,6 +42,9 @@ describe('OperationsService', () => {
       sale.irrf = 0.05;
       sale.operation_date = new Date('2023-06-10');
 
+      const previousOperation = new Operations();
+      previousOperation.loss_compensate = -50;
+
       const operations = new Operations();
       operations.purchase_ticket_id = correspondingPurchase;
       operations.ticket = 'VALE3';
@@ -56,13 +59,23 @@ describe('OperationsService', () => {
       operations.invested_days = 2;
       operations.percentage = 4;
 
-      jest
-        .spyOn(operationsRepository, 'save')
-        .mockResolvedValueOnce(operations);
+      operationsRepository.findOne = jest
+        .fn()
+        .mockResolvedValue(previousOperation);
+      operationsRepository.save = jest.fn().mockResolvedValue(operations);
 
       await service.createOperation(correspondingPurchase, sale);
 
-      expect(operationsRepository.save).toHaveBeenCalledWith(operations);
+      expect(operationsRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          loss_compensate: expect.any(Object),
+        },
+        order: {
+          sale_operation_date: 'DESC',
+        },
+      });
+      expect(operationsRepository.save).toHaveBeenCalledTimes(2);
+      expect(operationsRepository.save).toHaveBeenCalledWith(previousOperation);
     });
 
     it('should throw an AppError when an error occurs', async () => {
