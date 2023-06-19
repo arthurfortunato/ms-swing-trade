@@ -29,16 +29,25 @@ export class StockSaleService {
   async createStockSale(stockDto: StockRegistrationDto) {
     this.logger.log('Starting registered stock sale');
 
-    const { ticket, quantity } = stockDto;
+    const { ticket, quantity, value } = stockDto;
     let quantityToSell = quantity;
     let quantityExecuted = 0;
     let taxCharged = false;
     const correspondingPurchase = await this.getCorrespondingPurchasesActive(
       ticket,
     );
-    let amountActivePurchases = correspondingPurchase.length;
-    let saleTotalOperation = 0;
+    let amountActivePurchases = correspondingPurchase.reduce(
+      (sum, purchase) => sum + purchase.quantity,
+      0,
+    );
+
     let saleTotalOperationToDarf = 0;
+
+    if (amountActivePurchases >= quantityToSell) {
+      saleTotalOperationToDarf = quantityToSell * value;
+    } else {
+      saleTotalOperationToDarf = amountActivePurchases * value;
+    }
 
     while (quantityToSell > 0) {
       this.logger.log(
@@ -67,11 +76,6 @@ export class StockSaleService {
         taxCharged = true;
 
         const newStock = this.createStockRegistrationObject(sale);
-        saleTotalOperation = saleTotalOperation + sale.total_operation;
-
-        if (amountActivePurchases === 1) {
-          saleTotalOperationToDarf = saleTotalOperation;
-        }
 
         await this.saleRepository.save(sale);
         await this.purchaseRepository.save(correspondingPurchase);
@@ -81,6 +85,7 @@ export class StockSaleService {
           sale,
           saleTotalOperationToDarf,
         );
+
         quantityExecuted += quantitySold;
         quantityToSell -= quantitySold;
         amountActivePurchases--;

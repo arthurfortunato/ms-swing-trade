@@ -142,7 +142,7 @@ describe('StockSaleService', () => {
       expect(operationsService.createOperation).toHaveBeenCalledWith(
         correspondingPurchase,
         createdSale,
-        createdSale.total_operation,
+        21000,
       );
     });
 
