@@ -17,7 +17,11 @@ export class OperationsService {
     private operationsRepository: Repository<Operations>,
   ) {}
 
-  async createOperation(correspondingPurchase: Purchase, sale: Sale, saleTotalOperationToDarf: number) {
+  async createOperation(
+    correspondingPurchase: Purchase,
+    sale: Sale,
+    saleTotalOperationToDarf: number,
+  ) {
     try {
       this.logger.log('Starting save operation...');
 
