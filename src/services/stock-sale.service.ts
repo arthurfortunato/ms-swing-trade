@@ -32,7 +32,7 @@ export class StockSaleService {
     const { ticket, quantity } = stockDto;
     let quantityToSell = quantity;
     let quantityExecuted = 0;
-    const taxCharged = false;
+    let taxCharged = false;
 
     while (quantityToSell > 0) {
       this.logger.log(
@@ -58,6 +58,8 @@ export class StockSaleService {
           taxCharged,
           correspondingPurchase,
         );
+
+        taxCharged = true;
 
         const newStock = this.createStockRegistrationObject(sale);
 
