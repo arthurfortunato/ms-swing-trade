@@ -17,7 +17,7 @@ export class OperationsService {
     private operationsRepository: Repository<Operations>,
   ) {}
 
-  async createOperation(correspondingPurchase: Purchase, sale: Sale) {
+  async createOperation(correspondingPurchase: Purchase, sale: Sale, saleTotalOperationToDarf: number) {
     try {
       this.logger.log('Starting save operation...');
 
@@ -64,7 +64,7 @@ export class OperationsService {
       }
 
       operations.darf = calculateDarf(
-        saleTotalOperation,
+        saleTotalOperationToDarf,
         operations.gross_profit,
         operations.irrf,
       );

@@ -89,6 +89,10 @@ describe('StockSaleService', () => {
         0.00005 * correspondingPurchase.quantity * stockDto.value;
 
       jest
+        .spyOn(purchaseRepository, 'find')
+        .mockResolvedValue([correspondingPurchase]);
+
+      jest
         .spyOn(purchaseRepository, 'findOne')
         .mockResolvedValueOnce(correspondingPurchase);
 
@@ -138,10 +142,13 @@ describe('StockSaleService', () => {
       expect(operationsService.createOperation).toHaveBeenCalledWith(
         correspondingPurchase,
         createdSale,
+        createdSale.total_operation,
       );
     });
 
     it('should throw an AppError when there is no corresponding purchase', async () => {
+      jest.spyOn(purchaseRepository, 'find').mockResolvedValue([]);
+
       jest
         .spyOn(purchaseRepository, 'findOne')
         .mockResolvedValueOnce(undefined);
@@ -164,6 +171,10 @@ describe('StockSaleService', () => {
       correspondingPurchase.status = STOCK_STATUS_OPEN;
 
       const createdSale = new Sale();
+
+      jest
+        .spyOn(purchaseRepository, 'find')
+        .mockResolvedValue([correspondingPurchase]);
 
       jest
         .spyOn(purchaseRepository, 'findOne')

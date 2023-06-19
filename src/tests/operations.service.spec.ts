@@ -64,7 +64,7 @@ describe('OperationsService', () => {
         .mockResolvedValue(previousOperation);
       operationsRepository.save = jest.fn().mockResolvedValue(operations);
 
-      await service.createOperation(correspondingPurchase, sale);
+      await service.createOperation(correspondingPurchase, sale, sale.total_operation);
 
       expect(operationsRepository.findOne).toHaveBeenCalledWith({
         where: {
@@ -95,7 +95,7 @@ describe('OperationsService', () => {
         .mockRejectedValueOnce(new Error('Unexpected error'));
 
       try {
-        await service.createOperation(correspondingPurchase, sale);
+        await service.createOperation(correspondingPurchase, sale, sale.total_operation);
         fail('Expected an AppError to be thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(AppError);

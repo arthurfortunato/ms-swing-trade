@@ -33,19 +33,24 @@ export class StockSaleService {
     let quantityToSell = quantity;
     let quantityExecuted = 0;
     let taxCharged = false;
+    const correspondingPurchase = await this.getCorrespondingPurchasesActive(
+      ticket,
+    );
+    let amountActivePurchases = correspondingPurchase.length;
+    let saleTotalOperation = 0;
+    let saleTotalOperationToDarf = 0;
 
     while (quantityToSell > 0) {
       this.logger.log(
         'Checking if there is a corresponding purchase with the ticket',
       );
-      const correspondingPurchase = await this.getCorrespondingPurchase(ticket);
 
+      const correspondingPurchase = await this.getCorrespondingPurchase(ticket);
       if (correspondingPurchase) {
         const quantitySold = Math.min(
           correspondingPurchase.quantity,
           quantityToSell,
         );
-
         correspondingPurchase.quantity -= quantitySold;
 
         if (correspondingPurchase.quantity === 0) {
@@ -62,6 +67,11 @@ export class StockSaleService {
         taxCharged = true;
 
         const newStock = this.createStockRegistrationObject(sale);
+        saleTotalOperation = saleTotalOperation + sale.total_operation;
+
+        if (amountActivePurchases === 1) {
+          saleTotalOperationToDarf = saleTotalOperation;
+        }
 
         await this.saleRepository.save(sale);
         await this.purchaseRepository.save(correspondingPurchase);
@@ -69,9 +79,11 @@ export class StockSaleService {
         await this.operationsService.createOperation(
           correspondingPurchase,
           sale,
+          saleTotalOperationToDarf,
         );
         quantityExecuted += quantitySold;
         quantityToSell -= quantitySold;
+        amountActivePurchases--;
 
         this.logger.log(
           `Sale of ${quantitySold} units successfully completed!`,
@@ -105,6 +117,12 @@ export class StockSaleService {
     ticket: string,
   ): Promise<Purchase | undefined> {
     return this.purchaseRepository.findOne({
+      where: { ticket, status: 'OPEN' },
+      order: { operation_date: 'ASC' },
+    });
+  }
+  private async getCorrespondingPurchasesActive(ticket: string) {
+    return this.purchaseRepository.find({
       where: { ticket, status: 'OPEN' },
       order: { operation_date: 'ASC' },
     });
