@@ -56,7 +56,7 @@ export class StockPurchaseService {
   async getAllRegistrations() {
     const registrations = await this.stockRegistrationRepository.find({
       order: {
-        operation_date: 'ASC',
+        operation_date: 'DESC',
       },
     });
 
