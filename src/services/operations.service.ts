@@ -106,7 +106,6 @@ export class OperationsService {
         sale_operation_date: 'DESC',
       },
     });
-    
 
     if (operations.length === 0) {
       this.logger.error('No operations found');
