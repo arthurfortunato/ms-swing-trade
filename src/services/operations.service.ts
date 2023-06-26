@@ -101,7 +101,12 @@ export class OperationsService {
   }
 
   async getOperations() {
-    const operations = await this.operationsRepository.find();
+    const operations = await this.operationsRepository.find({
+      order: {
+        sale_operation_date: 'DESC',
+      },
+    });
+    
 
     if (operations.length === 0) {
       this.logger.error('No operations found');
