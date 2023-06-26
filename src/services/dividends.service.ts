@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DividendsDto } from 'src/dtos/dividends.dto';
-import { Dividends } from 'src/entities/dividends.entity';
-import { AppError } from 'src/error/AppError';
+import { DividendsDto } from '../dtos/dividends.dto';
+import { Dividends } from '../entities/dividends.entity';
+import { AppError } from '../error/AppError';
 import { Repository } from 'typeorm';
 
 @Injectable()

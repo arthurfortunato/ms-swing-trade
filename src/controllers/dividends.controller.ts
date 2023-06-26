@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { DividendsDto } from 'src/dtos/dividends.dto';
-import { TypeDividends } from 'src/enums/type-dividends.enum';
-import { DividendsService } from 'src/services/dividends.service';
+import { DividendsDto } from '../dtos/dividends.dto';
+import { TypeDividends } from '../enums/type-dividends.enum';
+import { DividendsService } from '../services/dividends.service';
 
 @ApiTags('Dividends record')
 @Controller('dividends-registration')
