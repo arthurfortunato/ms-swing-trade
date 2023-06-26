@@ -64,7 +64,7 @@ describe('DividendsService', () => {
         message: 'Dividends registered successfully!',
       });
     });
-    
+
     it('should create a new jrc', async () => {
       const response = {
         status: jest.fn().mockReturnThis(),
