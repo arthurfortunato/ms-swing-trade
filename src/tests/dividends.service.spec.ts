@@ -72,8 +72,8 @@ describe('DividendsService', () => {
       };
 
       jest.spyOn(dividendsRepository, 'create').mockImplementation(() => {
-        throw new Error('Error registered purchase');
-      });
+        throw new Error('Error registered dividends');
+      }); 
 
       try {
         await service.createDividends(dividendsDto);
@@ -83,6 +83,34 @@ describe('DividendsService', () => {
         expect(error.message).toBe('Error registered dividends');
         expect(error.statusCode).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
       }
+    });
+
+    describe('getAllDividends', () => {
+      it('should return an array of dividends', async () => {
+        const dividends = [new Dividends(), new Dividends()];
+  
+        jest
+          .spyOn(dividendsRepository, 'find')
+          .mockResolvedValue(dividends);
+  
+        const result = await service.getAllDividends();
+  
+        expect(dividendsRepository.find).toHaveBeenCalled();
+        expect(result).toEqual(dividends);
+      });
+  
+      it('should throw an AppError if no dividends are found', async () => {
+        jest.spyOn(dividendsRepository, 'find').mockResolvedValue([]);
+  
+        try {
+          await service.getAllDividends();
+          fail('Expected an AppError to be thrown');
+        } catch (error) {
+          expect(error).toBeInstanceOf(AppError);
+          expect(error.message).toBe('No dividends found');
+          expect(error.statusCode).toBe(HttpStatus.NOT_FOUND);
+        }
+      });
     });
   });
 });

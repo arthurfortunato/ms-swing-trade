@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   Res,
@@ -44,5 +45,12 @@ export class DividendsController {
     return res
       .status(HttpStatus.CREATED)
       .send({ message: 'JRC registered successfully!' });
+  }
+
+  @Get()
+  async getAllDividends(@Res() res: Response) {
+    const operations = await this.dividendsService.getAllDividends();
+
+    return res.status(HttpStatus.OK).json(operations);
   }
 }

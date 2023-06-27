@@ -96,5 +96,25 @@ describe('DividendsService', () => {
         message: 'JRC registered successfully!',
       });
     });
+
+    describe('getAllDividends', () => {
+      it('should return all dividends', async () => {
+        const response = {
+          status: jest.fn().mockReturnThis(),
+          json: jest.fn(),
+        };
+
+        const dividends = [new Dividends(), new Dividends()];
+
+        jest
+          .spyOn(dividendsService, 'getAllDividends')
+          .mockResolvedValue(dividends);
+
+        await controller.getAllDividends(response as any);
+
+        expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
+        expect(response.json).toHaveBeenCalledWith(dividends);
+      });
+    });
   });
 });

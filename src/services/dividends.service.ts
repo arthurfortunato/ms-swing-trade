@@ -63,4 +63,18 @@ export class DividendsService {
       );
     }
   }
+
+  async getAllDividends() {
+    const registrations = await this.dividendsRepository.find({
+      order: {
+        payment_date: 'DESC',
+      },
+    });
+
+    if (registrations.length === 0) {
+      this.logger.error('No dividends found');
+      throw new AppError('No dividends found', HttpStatus.NOT_FOUND);
+    }
+    return registrations;
+  }
 }
