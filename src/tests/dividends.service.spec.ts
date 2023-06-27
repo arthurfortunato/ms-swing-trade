@@ -73,7 +73,7 @@ describe('DividendsService', () => {
 
       jest.spyOn(dividendsRepository, 'create').mockImplementation(() => {
         throw new Error('Error registered dividends');
-      }); 
+      });
 
       try {
         await service.createDividends(dividendsDto);
@@ -88,20 +88,18 @@ describe('DividendsService', () => {
     describe('getAllDividends', () => {
       it('should return an array of dividends', async () => {
         const dividends = [new Dividends(), new Dividends()];
-  
-        jest
-          .spyOn(dividendsRepository, 'find')
-          .mockResolvedValue(dividends);
-  
+
+        jest.spyOn(dividendsRepository, 'find').mockResolvedValue(dividends);
+
         const result = await service.getAllDividends();
-  
+
         expect(dividendsRepository.find).toHaveBeenCalled();
         expect(result).toEqual(dividends);
       });
-  
+
       it('should throw an AppError if no dividends are found', async () => {
         jest.spyOn(dividendsRepository, 'find').mockResolvedValue([]);
-  
+
         try {
           await service.getAllDividends();
           fail('Expected an AppError to be thrown');
