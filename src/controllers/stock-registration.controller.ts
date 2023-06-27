@@ -26,26 +26,39 @@ export class StockRegistrationController {
   @Post('purchase')
   @UsePipes(ValidationPipe)
   async createStockPurchase(
-    @Body() createPurchaseDto: StockRegistrationDto,
+    @Body() createPurchaseDto: StockRegistrationDto[] | StockRegistrationDto,
     @Res() res: Response,
   ) {
-    await this.stockPurchaseService.createStockPurchase(createPurchaseDto);
-
+    if (Array.isArray(createPurchaseDto)) {
+      for (const purchaseDto of createPurchaseDto) {
+        await this.stockPurchaseService.createStockPurchase(purchaseDto);
+      }
+    } else {
+      await this.stockPurchaseService.createStockPurchase(createPurchaseDto);
+    }
+  
     return res
       .status(HttpStatus.CREATED)
-      .send({ message: 'Successful purchase!' });
+      .send({ message: 'Successful purchase(s)!' });
   }
 
   @Post('sale')
   @UsePipes(ValidationPipe)
   async createStockSale(
-    @Body() createStockSaleDto: StockRegistrationDto,
+    @Body() createStockSaleDto: StockRegistrationDto[] | StockRegistrationDto,
     @Res() res: Response,
   ) {
-    await this.stockSaleService.createStockSale(createStockSaleDto);
-
-    return res.status(HttpStatus.CREATED).send({ message: 'Successful sale!' });
+    if (Array.isArray(createStockSaleDto)) {
+      for (const saleDto of createStockSaleDto) {
+        await this.stockSaleService.createStockSale(saleDto);
+      }
+    } else {
+      await this.stockSaleService.createStockSale(createStockSaleDto);
+    }
+  
+    return res.status(HttpStatus.CREATED).send({ message: 'Successful sale(s)!' });
   }
+  
 
   @Get()
   async getAllRegistrations(@Res() res: Response) {

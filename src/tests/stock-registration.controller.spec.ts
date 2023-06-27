@@ -75,7 +75,7 @@ describe('StockRegistrationController', () => {
         purchase,
       );
       expect(response.send).toHaveBeenCalledWith({
-        message: 'Successful purchase!',
+        message: 'Successful purchase(s)!',
       });
     });
   });
@@ -101,7 +101,7 @@ describe('StockRegistrationController', () => {
       expect(response.status).toHaveBeenCalledWith(HttpStatus.CREATED);
       expect(saleService.createStockSale).toHaveBeenCalledWith(sale);
       expect(response.send).toHaveBeenCalledWith({
-        message: 'Successful sale!',
+        message: 'Successful sale(s)!',
       });
     });
   });
