@@ -36,7 +36,7 @@ export class StockRegistrationController {
     } else {
       await this.stockPurchaseService.createStockPurchase(createPurchaseDto);
     }
-  
+
     return res
       .status(HttpStatus.CREATED)
       .send({ message: 'Successful purchase(s)!' });
@@ -55,10 +55,11 @@ export class StockRegistrationController {
     } else {
       await this.stockSaleService.createStockSale(createStockSaleDto);
     }
-  
-    return res.status(HttpStatus.CREATED).send({ message: 'Successful sale(s)!' });
+
+    return res
+      .status(HttpStatus.CREATED)
+      .send({ message: 'Successful sale(s)!' });
   }
-  
 
   @Get()
   async getAllRegistrations(@Res() res: Response) {
