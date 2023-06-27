@@ -86,16 +86,12 @@ describe('DividendsService', () => {
       createJRC.rate = dividendsDto.rate;
       createJRC.quantity = dividendsDto.quantity;
 
-      jest
-        .spyOn(dividendsService, 'createJRC')
-        .mockResolvedValue(createJRC);
+      jest.spyOn(dividendsService, 'createJRC').mockResolvedValue(createJRC);
 
       await controller.createJRC(createJRC, response);
 
       expect(response.status).toHaveBeenCalledWith(HttpStatus.CREATED);
-      expect(dividendsService.createJRC).toHaveBeenCalledWith(
-        createJRC,
-      );
+      expect(dividendsService.createJRC).toHaveBeenCalledWith(createJRC);
       expect(response.send).toHaveBeenCalledWith({
         message: 'JRC registered successfully!',
       });

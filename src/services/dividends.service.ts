@@ -44,8 +44,7 @@ export class DividendsService {
       this.logger.log('Starting registered dividends');
 
       const { rate, quantity } = dividendsDto;
-      const total = (rate * quantity) - (rate * quantity * 0.15);
-
+      const total = rate * quantity - rate * quantity * 0.15;
 
       const newDividends = this.dividendsRepository.create({
         total: total,
