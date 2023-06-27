@@ -79,22 +79,22 @@ describe('DividendsService', () => {
         quantity: 3000,
       };
 
-      const createDividends = new Dividends();
-      createDividends.type = dividendsDto.type;
-      createDividends.payment_date = dividendsDto.payment_date;
-      createDividends.ticket = dividendsDto.ticket;
-      createDividends.rate = dividendsDto.rate;
-      createDividends.quantity = dividendsDto.quantity;
+      const createJRC = new Dividends();
+      createJRC.type = dividendsDto.type;
+      createJRC.payment_date = dividendsDto.payment_date;
+      createJRC.ticket = dividendsDto.ticket;
+      createJRC.rate = dividendsDto.rate;
+      createJRC.quantity = dividendsDto.quantity;
 
       jest
-        .spyOn(dividendsService, 'createDividends')
-        .mockResolvedValue(createDividends);
+        .spyOn(dividendsService, 'createJRC')
+        .mockResolvedValue(createJRC);
 
-      await controller.createJRC(createDividends, response);
+      await controller.createJRC(createJRC, response);
 
       expect(response.status).toHaveBeenCalledWith(HttpStatus.CREATED);
-      expect(dividendsService.createDividends).toHaveBeenCalledWith(
-        createDividends,
+      expect(dividendsService.createJRC).toHaveBeenCalledWith(
+        createJRC,
       );
       expect(response.send).toHaveBeenCalledWith({
         message: 'JRC registered successfully!',

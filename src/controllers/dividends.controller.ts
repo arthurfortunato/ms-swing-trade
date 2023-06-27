@@ -39,7 +39,7 @@ export class DividendsController {
     @Res() res: Response,
   ) {
     createDividendsDto.type = TypeDividends.JRC;
-    await this.dividendsService.createDividends(createDividendsDto);
+    await this.dividendsService.createJRC(createDividendsDto);
 
     return res
       .status(HttpStatus.CREATED)

@@ -38,4 +38,30 @@ export class DividendsService {
       );
     }
   }
+
+  async createJRC(dividendsDto: DividendsDto) {
+    try {
+      this.logger.log('Starting registered dividends');
+
+      const { rate, quantity } = dividendsDto;
+      const total = (rate * quantity) - (rate * quantity * 0.15);
+
+
+      const newDividends = this.dividendsRepository.create({
+        total: total,
+        ...dividendsDto,
+      });
+
+      await this.dividendsRepository.save(newDividends);
+      this.logger.log('Dividends registered successfully!');
+
+      return newDividends;
+    } catch (error) {
+      throw new AppError(
+        'Error registered dividends',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        error,
+      );
+    }
+  }
 }
