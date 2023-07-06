@@ -46,7 +46,8 @@ export class OperationsService {
       operations.total_sale = saleTotalOperation;
       operations.sale_operation_date = sale.operation_date;
       operations.gross_profit = saleTotalOperation - purchaseTotalOperation;
-      operations.gross_profit_offset = saleTotalOperation - purchaseTotalOperation;
+      operations.gross_profit_offset =
+        saleTotalOperation - purchaseTotalOperation;
       operations.irrf = saleIrrf;
 
       const previousOperation = await this.operationsRepository.findOne({
