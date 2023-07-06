@@ -37,6 +37,9 @@ export class Operations {
 
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   gross_profit: number;
+  
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  gross_profit_offset: number;
 
   @Column({ type: 'decimal', precision: 19, scale: 4 })
   irrf: number;

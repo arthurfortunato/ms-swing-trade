@@ -46,6 +46,7 @@ export class OperationsService {
       operations.total_sale = saleTotalOperation;
       operations.sale_operation_date = sale.operation_date;
       operations.gross_profit = saleTotalOperation - purchaseTotalOperation;
+      operations.gross_profit_offset = saleTotalOperation - purchaseTotalOperation;
       operations.irrf = saleIrrf;
 
       const previousOperation = await this.operationsRepository.findOne({
@@ -60,7 +61,7 @@ export class OperationsService {
       if (previousOperation) {
         const currentGrossProfit = previousOperation.loss_compensate;
 
-        operations.gross_profit -= currentGrossProfit * -1;
+        operations.gross_profit_offset -= currentGrossProfit * -1;
 
         previousOperation.loss_compensate -= currentGrossProfit;
 
@@ -69,7 +70,7 @@ export class OperationsService {
 
       operations.darf = calculateDarf(
         saleTotalOperationToDarf,
-        operations.gross_profit,
+        operations.gross_profit_offset,
         operations.irrf,
       );
 
@@ -79,8 +80,8 @@ export class OperationsService {
           : 0;
 
       operations.loss_compensate =
-        operations.gross_profit < 0
-          ? operations.gross_profit - operations.irrf
+        operations.gross_profit_offset < 0
+          ? operations.gross_profit_offset - operations.irrf
           : 0;
 
       const investedDays = calculateDifferenceInDays(

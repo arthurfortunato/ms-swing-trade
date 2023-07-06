@@ -53,6 +53,12 @@ export class Migrate1685902591606 implements MigrationInterface {
             scale: 2,
           },
           {
+            name: 'gross_profit_offset',
+            type: 'decimal',
+            precision: 19,
+            scale: 2,
+          },
+          {
             name: 'irrf',
             type: 'decimal',
             precision: 19,
